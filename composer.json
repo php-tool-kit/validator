@@ -1,0 +1,63 @@
+{
+    "name": "php-tool-kit/validator",
+    "description": "Utilitário para validar valores em variáveis.",
+    "type": "library",
+    "homepage": "https://php-tool-kit.github.io/validator",
+    "readme": "README.md",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Ptk\\Validator\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Everton da Rosa",
+            "email": "everton3x@gmail.com",
+            "homepage": "https://everton3x.github.io",
+            "role": "Developer"
+        }
+    ],
+    "support": {
+        "email": "everton3x@gmail.com",
+        "issues": "https://github.com/everton3x/csrf/issues",
+        "source": "https://github.com/everton3x/csrf/source",
+        "docs": "https://github.com/everton3x/csrf/README.md"
+    },
+    "require": {
+        "php": ">=8.5.7"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "require-dev": {
+        "pestphp/pest": "5.x-dev",
+        "pestphp/pest-plugin-type-coverage": "5.x-dev",
+        "phpstan/extension-installer": "1.4.x-dev",
+        "phpstan/phpstan": "2.2.x-dev",
+        "squizlabs/php_codesniffer": "4.x-dev"
+    },
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true,
+            "phpstan/extension-installer": true
+        }
+    },
+    "scripts": {
+        "test": [
+            "./vendor/bin/pest --coverage --coverage-html ./coverage/html/",
+            "./vendor/bin/pest --type-coverage"
+        ],
+        "static": "vendor/bin/phpstan analyse",
+        "code": [
+            "@fix-code",
+            "@psr-code"
+        ],
+        "fix-code": "vendor/bin/phpcbf --standard=PSR1,PSR2,PSR12 --colors ./src",
+        "psr-code": "vendor/bin/phpcs --standard=PSR1,PSR2,PSR12 --colors -s --exclude=Generic.Files.LineLength ./src"
+    }
+}
