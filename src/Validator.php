@@ -21,6 +21,9 @@ final class Validator
 
     private null|int|float|string|DateTimeInterface $min = null;
     private null|int|float|string|DateTimeInterface $max = null;
+    private null|int|float|string|DateTimeInterface $betweenDown = null;
+    private null|int|float|string|DateTimeInterface $betweenUp = null;
+
 
     public function __construct()
     {}
@@ -35,6 +38,7 @@ final class Validator
         $this->checkIs();
         $this->checkMin();
         $this->checkMax();
+        $this->checkBetween();
 
         return empty($this->failed());
     }
@@ -293,5 +297,36 @@ final class Validator
         $this->result['max'] = !($this->data > $this->max);
         return;
 
+    }
+
+    public function between(int|float|string|DateTimeInterface $down, int|float|string|DateTimeInterface $up): self
+    {
+        if(gettype($down) !== gettype($up)) throw new \RuntimeException('Type of $down is differente of type of $up.');
+
+        $this->betweenDown = $down;
+        $this->betweenUp = $up;
+        return $this;
+    }
+
+    private function checkBetween(): void{
+        $this->result['between'] = null;
+        // Não testa
+        if(is_null($this->betweenDown) || is_null($this->betweenUp)) return;
+
+        // Se for int ou float
+        if(is_numeric($this->data)){
+            $this->result['between'] = !(($this->data < $this->betweenDown) || ($this->data > $this->betweenUp));
+            return;
+        }
+
+        // Se for string
+        if(is_string($this->data)){
+            $this->result['between'] = !((mb_strlen($this->data) < $this->betweenDown) || (mb_strlen($this->data) > $this->betweenUp));
+            return;
+        }
+
+        // Se for date-time
+        $this->result['between'] = !(($this->data < $this->betweenDown) || ($this->data > $this->betweenUp));
+        return;
     }
 }
