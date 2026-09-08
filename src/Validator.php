@@ -23,7 +23,7 @@ final class Validator
     private null|int|float|string|DateTimeInterface $max = null;
     private null|int|float|string|DateTimeInterface $betweenDown = null;
     private null|int|float|string|DateTimeInterface $betweenUp = null;
-    private ?array $list = null;
+    private null|array|string $contains = null;
 
     public function __construct()
     {}
@@ -39,7 +39,7 @@ final class Validator
         $this->checkMin();
         $this->checkMax();
         $this->checkBetween();
-        $this->checkList();
+        $this->checkContains();
 
         return empty($this->failed());
     }
@@ -331,18 +331,27 @@ final class Validator
         return;
     }
 
-    public function list(array $list): self
+    public function contains(string|array $contains): self
     {
-        $this->list = $list;
+        $this->contains = $contains;
         return $this;
     }
 
-    private function checkList(): void
+    private function checkContains(): void
     {
-        $this->result['list'] = null;
+        $this->result['contains'] = null;
         // Não testa
-        if(is_null($this->list)) return;
+        if(is_null($this->contains)) return;
 
-        $this->result['list'] = in_array($this->data, $this->list);
+        // Se é array
+        if(is_array($this->contains)){
+            $this->result['contains'] = in_array($this->data, $this->contains);
+            return;
+        }
+
+        // se string
+        if(is_string($this->contains)) {
+            $this->result['contains'] = str_contains($this->data, $this->contains);
+        }
     }
 }
