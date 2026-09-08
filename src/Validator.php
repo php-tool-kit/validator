@@ -15,6 +15,8 @@ final class Validator
 
     private ?Types $type = null;
 
+    private ?string $is = null;
+
     public function __construct()
     {}
 
@@ -25,6 +27,7 @@ final class Validator
         $this->checkEmpty();
         $this->checkNullable();
         $this->checkType();
+        $this->checkIs();
 
         return empty($this->failed());
     }
@@ -207,5 +210,21 @@ final class Validator
                 $this->result['type'] = false;
                 return;
         }
+    }
+
+    public function is(string $className): self
+    {
+        $this->is = $className;
+        return $this;
+    }
+
+    private function checkIs(): void
+    {
+        $this->result['is'] = null;
+        // Não testa
+        if(is_null($this->is)) return;
+
+        // Testa se a variável é uma classe com o mesmo nome
+        $this->result['is'] = get_class($this->data) === $this->is;
     }
 }
