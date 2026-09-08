@@ -2,6 +2,8 @@
 
 namespace Ptk\Validator;
 
+use DateTimeInterface;
+
 final class Validator
 {
     private mixed $data;
@@ -17,6 +19,8 @@ final class Validator
 
     private ?string $is = null;
 
+    private null|int|float|string|DateTimeInterface $min = null;
+
     public function __construct()
     {}
 
@@ -28,6 +32,7 @@ final class Validator
         $this->checkNullable();
         $this->checkType();
         $this->checkIs();
+        $this->checkMin();
 
         return empty($this->failed());
     }
@@ -226,5 +231,35 @@ final class Validator
 
         // Testa se a variável é uma classe com o mesmo nome
         $this->result['is'] = get_class($this->data) === $this->is;
+    }
+
+    public function min(int|float|string|DateTimeInterface $min): self
+    {
+        $this->min = $min;
+        return $this;
+    }
+
+    private function checkMin(): void
+    {
+        $this->result['min'] = null;
+        // Não testa
+        if(is_null($this->min)) return;
+
+        // Se for int ou float
+        if(is_numeric($this->data)){
+            $this->result['min'] = !($this->data < $this->min);
+            return;
+        }
+
+        // Se for string
+        if(is_string($this->data)){
+            $this->result['min'] = !(mb_strlen($this->data) < $this->min);
+            return;
+        }
+
+        // Se for date-time
+        $this->result['min'] = !($this->data < $this->min);
+        return;
+
     }
 }
