@@ -10,6 +10,9 @@ final class Validator
 
     private ?bool $required = null;
     private ?bool $empty = null;
+
+    private ?bool $nullable = null;
+
     public function __construct()
     {}
 
@@ -18,6 +21,7 @@ final class Validator
         $this->data = $data;
         $this->checkRequired();
         $this->checkEmpty();
+        $this->checkNullable();
 
         return empty($this->failed());
     }
@@ -111,7 +115,33 @@ final class Validator
                 return;
             }
         }
-        
+    }
 
+    public function nullable(bool $nullable = true): self
+    {
+        $this->nullable = $nullable;
+        return $this;
+    }
+
+    private function checkNullable(): void
+    {
+        $this->result['nullable'] = null;
+        // Não testa
+        if(is_null($this->nullable)) return;
+
+        $this->result['nullable'] = true;
+        // Pode ser nulo
+        if($this->nullable === true) {
+            // Não precisa testar
+            return;
+        }
+
+        // Não pode ser nulo
+        if($this->nullable === false) {
+            if(is_null($this->data)) {
+                $this->result['nullable'] = false;
+            }
+            return;
+        }
     }
 }
