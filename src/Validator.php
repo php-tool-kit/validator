@@ -20,6 +20,7 @@ final class Validator
     private ?string $is = null;
 
     private null|int|float|string|DateTimeInterface $min = null;
+    private null|int|float|string|DateTimeInterface $max = null;
 
     public function __construct()
     {}
@@ -33,6 +34,7 @@ final class Validator
         $this->checkType();
         $this->checkIs();
         $this->checkMin();
+        $this->checkMax();
 
         return empty($this->failed());
     }
@@ -259,6 +261,36 @@ final class Validator
 
         // Se for date-time
         $this->result['min'] = !($this->data < $this->min);
+        return;
+
+    }
+
+    public function max(int|float|string|DateTimeInterface $max): self
+    {
+        $this->max = $max;
+        return $this;
+    }
+
+    private function checkMax(): void
+    {
+        $this->result['max'] = null;
+        // Não testa
+        if(is_null($this->max)) return;
+
+        // Se for int ou float
+        if(is_numeric($this->data)){
+            $this->result['max'] = !($this->data > $this->max);
+            return;
+        }
+
+        // Se for string
+        if(is_string($this->data)){
+            $this->result['max'] = !(mb_strlen($this->data) > $this->max);
+            return;
+        }
+
+        // Se for date-time
+        $this->result['max'] = !($this->data > $this->max);
         return;
 
     }
