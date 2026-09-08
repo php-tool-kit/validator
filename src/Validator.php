@@ -23,7 +23,7 @@ final class Validator
     private null|int|float|string|DateTimeInterface $max = null;
     private null|int|float|string|DateTimeInterface $betweenDown = null;
     private null|int|float|string|DateTimeInterface $betweenUp = null;
-
+    private ?array $list = null;
 
     public function __construct()
     {}
@@ -39,6 +39,7 @@ final class Validator
         $this->checkMin();
         $this->checkMax();
         $this->checkBetween();
+        $this->checkList();
 
         return empty($this->failed());
     }
@@ -328,5 +329,20 @@ final class Validator
         // Se for date-time
         $this->result['between'] = !(($this->data < $this->betweenDown) || ($this->data > $this->betweenUp));
         return;
+    }
+
+    public function list(array $list): self
+    {
+        $this->list = $list;
+        return $this;
+    }
+
+    private function checkList(): void
+    {
+        $this->result['list'] = null;
+        // Não testa
+        if(is_null($this->list)) return;
+
+        $this->result['list'] = in_array($this->data, $this->list);
     }
 }
