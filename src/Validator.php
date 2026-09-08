@@ -13,6 +13,8 @@ final class Validator
 
     private ?bool $nullable = null;
 
+    private ?Types $type = null;
+
     public function __construct()
     {}
 
@@ -22,6 +24,7 @@ final class Validator
         $this->checkRequired();
         $this->checkEmpty();
         $this->checkNullable();
+        $this->checkType();
 
         return empty($this->failed());
     }
@@ -142,6 +145,61 @@ final class Validator
                 $this->result['nullable'] = false;
             }
             return;
+        }
+    }
+
+    public function type(Types $type): self
+    {
+        $this->type = $type;
+        return $this;
+    }
+
+    private function checkType(): void
+    {
+        $this->result['type'] = null;
+        // Não testa
+        if(is_null($this->type)) return;
+
+        // Não pode ser nullo
+        if(is_null($this->data)) {
+            $this->result['type'] = false;
+            return;
+        }
+
+        // Testa o tipo
+        $this->result['type'] = true;
+        switch($this->type){
+            case Types::BOOL:
+                $this->result['type'] = is_bool($this->data);
+                return;
+            case Types::NUMERIC:
+                $this->result['type'] = is_numeric($this->data);
+                return;
+            case Types::INT:
+                $this->result['type'] = is_int($this->data);
+                return;
+            case Types::FLOAT:
+                $this->result['type'] = is_float($this->data);
+                return;
+            case Types::STRING:
+                $this->result['type'] = is_string($this->data);
+                return;
+            case Types::ARRAY:
+                $this->result['type'] = is_array($this->data);
+                return;
+            case Types::OBJECT:
+                $this->result['type'] = is_object($this->data);
+                return;
+            case Types::RESOURCE:
+                $this->result['type'] = is_resource($this->data);
+                return;
+            case Types::CALLABLE:
+                $this->result['type'] = is_callable($this->data);
+                return;
+            default:
+                // Se não for nenhum dos tipos...
+                $this->result['type'] = false;
+                return;
         }
     }
 }
