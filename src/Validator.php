@@ -113,6 +113,12 @@ final class Validator
                 return;
             }
 
+            // Se for array
+            if(is_array($this->data)){
+                $this->result['empty'] = !($this->data === []);
+                return;
+            }
+            // se não for array
             if(mb_strlen($this->data) === 0){
                 $this->result['empty'] = false;
                 return;
