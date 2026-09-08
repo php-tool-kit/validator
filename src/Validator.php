@@ -24,6 +24,13 @@ final class Validator
     private null|int|float|string|DateTimeInterface $betweenDown = null;
     private null|int|float|string|DateTimeInterface $betweenUp = null;
     private null|array|string $contains = null;
+    
+    private ?bool $file = null;
+    private ?bool $directory = null;
+    private ?bool $exists = null;
+    private ?string $startswith = null;
+    private ?string $endswith = null;
+
 
     public function __construct()
     {}
@@ -40,6 +47,11 @@ final class Validator
         $this->checkMax();
         $this->checkBetween();
         $this->checkContains();
+        $this->checkFile();
+        $this->checkDirectory();
+        $this->checkExists();
+        $this->checkStartsWith();
+        $this->checkEndsWith();
 
         return empty($this->failed());
     }
@@ -353,5 +365,79 @@ final class Validator
         if(is_string($this->contains)) {
             $this->result['contains'] = str_contains($this->data, $this->contains);
         }
+    }
+
+    public function file(bool $file): self
+    {
+        $this->file = $file;
+        return $this;
+    }
+
+    private function checkFile(): void
+    {
+        $this->result['file'] = null;
+        // Não testa
+        if(is_null($this->file) || $this->file === false) return;
+
+        $this->result['file'] = is_file($this->data);
+    }
+
+    public function directory(bool $directory): self
+    {
+        $this->directory = $directory;
+        return $this;
+    }
+
+    private function checkDirectory(): void
+    {
+        $this->result['directory'] = null;
+        // Não testa
+        if(is_null($this->directory) || $this->directory === false) return;
+
+        $this->result['directory'] = is_dir($this->data);
+    }
+
+    public function exists(bool $exists): self
+    {
+        $this->exists = $exists;
+        return $this;
+    }
+
+    private function checkExists(): void
+    {
+        $this->result['exists'] = null;
+        // Não testa
+        if(is_null($this->exists) || $this->exists === false) return;
+
+        $this->result['exists'] = file_exists($this->data);
+    }
+
+    public function startswith(string $substr): self
+    {
+        $this->startswith = $substr;
+        return $this;
+    }
+
+    private function checkStartsWith(): void
+    {
+        $this->result['startswith'] = null;
+        // Não testa
+        if(is_null($this->startswith)) return;
+        $this->result['startswith'] = str_starts_with($this->data, $this->startswith);
+    }
+    
+    public function endswith(string $substr): self
+    {
+        $this->endswith = $substr;
+        return $this;
+    }
+
+    private function checkEndsWith(): void
+    {
+        $this->result['endswith'] = null;
+        // Não testa
+        if(is_null($this->endswith)) return;
+        // Testa
+        $this->result['endswith'] = str_ends_with($this->data, $this->endswith);
     }
 }
