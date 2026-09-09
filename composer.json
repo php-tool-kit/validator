@@ -25,9 +25,9 @@
     ],
     "support": {
         "email": "everton3x@gmail.com",
-        "issues": "https://github.com/everton3x/csrf/issues",
-        "source": "https://github.com/everton3x/csrf/source",
-        "docs": "https://github.com/everton3x/csrf/README.md"
+        "issues": "https://github.com/php-tool-kit/validator/issues",
+        "source": "https://github.com/php-tool-kit/validator/source",
+        "docs": "https://github.com/php-tool-kit/validator/README.md"
     },
     "require": {
         "php": ">=8.5.7",
