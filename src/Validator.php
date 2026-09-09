@@ -18,12 +18,27 @@ use DateTimeInterface;
  * 3. Chamar validate() passando o dado a ser validado;
  * 4. Consultar o resultado através de result(), passed() ou failed().
  *
- * Cada regra configurada é armazenada internamente e, ao chamar validate(),
- * cada regra é testada por seu respectivo método checkXxx(), armazenando
- * o resultado (true, false ou null quando a regra não foi configurada)
- * no array $result, indexado pelo nome da regra.
+ * Cada regra configurada é armazenada internamente e, ao chamar
+ * validate(), cada regra é testada pelo seu respectivo método
+ * checkXxx(), que grava o resultado no array $result, indexado pelo
+ * nome da regra: true (passou), false (falhou) ou null (regra não
+ * configurada e, portanto, não testada).
  *
- * Documentação gerada com auxílio de inteligência artificial
+ * Exemplo geral:
+ *
+ * ```php
+ * $validator = (new Validator())
+ *     ->required()
+ *     ->type(Types::STRING)
+ *     ->min(3)
+ *     ->max(20);
+ *
+ * if ($validator->validate('everton')) {
+ *     echo "Valor válido!";
+ * } else {
+ *     print_r($validator->failed()); // ['max' => false], por exemplo
+ * }
+ * ```
  *
  * @package Ptk\Validator
  */
@@ -31,9 +46,8 @@ final class Validator
 {
     /**
      * Armazena o dado que está sendo validado na chamada atual de
-     * validate().
-     *
-     * Documentação gerada com auxílio de inteligência artificial
+     * validate(). É preenchido por validate() e consumido pelos métodos
+     * checkXxx() durante a execução das regras.
      *
      * @var mixed
      */
@@ -41,11 +55,20 @@ final class Validator
 
     /**
      * Armazena o resultado de cada regra testada, indexado pelo nome da
-     * regra (ex.: 'required', 'empty', 'type', etc). Cada valor pode ser
-     * true (passou), false (falhou) ou null (regra não configurada,
+     * regra (ex.: 'required', 'empty', 'type', etc.). Cada valor pode
+     * ser true (passou), false (falhou) ou null (regra não configurada,
      * portanto não testada).
      *
-     * Documentação gerada com auxílio de inteligência artificial
+     * Exemplo de conteúdo após uma validação:
+     *
+     * ```php
+     * [
+     *     'required' => true,
+     *     'type'     => true,
+     *     'min'      => null, // regra não configurada
+     *     'max'      => false,
+     * ]
+     * ```
      *
      * @var array<string, ?bool>
      */
@@ -53,49 +76,42 @@ final class Validator
 
     /**
      * Define se o dado é obrigatório (não pode ser nulo ou vazio).
-     * Null significa que a regra não foi configurada.
-     *
-     * Documentação gerada com auxílio de inteligência artificial
+     * Configurado pelo método required(). Null significa que a regra
+     * não foi configurada.
      *
      * @var bool|null
      */
     private ?bool $required = null;
 
     /**
-     * Define se o dado pode ser vazio. Null significa que a regra não
-     * foi configurada.
-     *
-     * Documentação gerada com auxílio de inteligência artificial
+     * Define se o dado pode ser vazio. Configurado pelo método empty().
+     * Null significa que a regra não foi configurada.
      *
      * @var bool|null
      */
     private ?bool $empty = null;
 
     /**
-     * Define se o dado pode ser nulo. Null significa que a regra não foi
-     * configurada.
-     *
-     * Documentação gerada com auxílio de inteligência artificial
+     * Define se o dado pode ser nulo. Configurado pelo método
+     * nullable(). Null significa que a regra não foi configurada.
      *
      * @var bool|null
      */
     private ?bool $nullable = null;
 
     /**
-     * Define o tipo de dado esperado, de acordo com o enum Types. Null
-     * significa que a regra não foi configurada.
-     *
-     * Documentação gerada com auxílio de inteligência artificial
+     * Define o tipo de dado esperado, de acordo com o enum Types.
+     * Configurado pelo método type(). Null significa que a regra não
+     * foi configurada.
      *
      * @var Types|null
      */
     private ?Types $type = null;
 
     /**
-     * Define o nome da classe que o dado deve ser instância. Null
-     * significa que a regra não foi configurada.
-     *
-     * Documentação gerada com auxílio de inteligência artificial
+     * Define o nome da classe que o dado deve ser instância (comparação
+     * exata, sem considerar herança). Configurado pelo método is().
+     * Null significa que a regra não foi configurada.
      *
      * @var string|null
      */
@@ -103,9 +119,8 @@ final class Validator
 
     /**
      * Valor mínimo aceito para o dado (numérico, comprimento de string
-     * ou data/hora). Null significa que a regra não foi configurada.
-     *
-     * Documentação gerada com auxílio de inteligência artificial
+     * ou data/hora). Configurado pelo método min(). Null significa que
+     * a regra não foi configurada.
      *
      * @var int|float|string|DateTimeInterface|null
      */
@@ -113,9 +128,8 @@ final class Validator
 
     /**
      * Valor máximo aceito para o dado (numérico, comprimento de string
-     * ou data/hora). Null significa que a regra não foi configurada.
-     *
-     * Documentação gerada com auxílio de inteligência artificial
+     * ou data/hora). Configurado pelo método max(). Null significa que
+     * a regra não foi configurada.
      *
      * @var int|float|string|DateTimeInterface|null
      */
@@ -125,8 +139,6 @@ final class Validator
      * Limite inferior do intervalo aceito ao usar between(). Null
      * significa que a regra não foi configurada.
      *
-     * Documentação gerada com auxílio de inteligência artificial
-     *
      * @var int|float|string|DateTimeInterface|null
      */
     private null|int|float|string|DateTimeInterface $betweenDown = null;
@@ -135,17 +147,14 @@ final class Validator
      * Limite superior do intervalo aceito ao usar between(). Null
      * significa que a regra não foi configurada.
      *
-     * Documentação gerada com auxílio de inteligência artificial
-     *
      * @var int|float|string|DateTimeInterface|null
      */
     private null|int|float|string|DateTimeInterface $betweenUp = null;
 
     /**
-     * Valor (ou lista de valores) que o dado deve conter. Null significa
-     * que a regra não foi configurada.
-     *
-     * Documentação gerada com auxílio de inteligência artificial
+     * Valor (ou lista de valores) que o dado deve conter. Configurado
+     * pelo método contains(). Null significa que a regra não foi
+     * configurada.
      *
      * @var array<mixed>|string|null
      */
@@ -153,9 +162,8 @@ final class Validator
 
     /**
      * Define se o dado (um caminho) deve ser validado como um arquivo
-     * existente. Null significa que a regra não foi configurada.
-     *
-     * Documentação gerada com auxílio de inteligência artificial
+     * existente. Configurado pelo método file(). Null significa que a
+     * regra não foi configurada.
      *
      * @var bool|null
      */
@@ -163,9 +171,8 @@ final class Validator
 
     /**
      * Define se o dado (um caminho) deve ser validado como um diretório
-     * existente. Null significa que a regra não foi configurada.
-     *
-     * Documentação gerada com auxílio de inteligência artificial
+     * existente. Configurado pelo método directory(). Null significa
+     * que a regra não foi configurada.
      *
      * @var bool|null
      */
@@ -173,30 +180,26 @@ final class Validator
 
     /**
      * Define se o dado (um caminho) deve ser validado quanto à sua
-     * existência no sistema de arquivos. Null significa que a regra não
-     * foi configurada.
-     *
-     * Documentação gerada com auxílio de inteligência artificial
+     * existência no sistema de arquivos. Configurado pelo método
+     * exists(). Null significa que a regra não foi configurada.
      *
      * @var bool|null
      */
     private ?bool $exists = null;
 
     /**
-     * Substring que o dado deve conter no início. Null significa que a
-     * regra não foi configurada.
-     *
-     * Documentação gerada com auxílio de inteligência artificial
+     * Substring que o dado deve conter no início. Configurado pelo
+     * método startswith(). Null significa que a regra não foi
+     * configurada.
      *
      * @var string|null
      */
     private ?string $startswith = null;
 
     /**
-     * Substring que o dado deve conter no final. Null significa que a
-     * regra não foi configurada.
-     *
-     * Documentação gerada com auxílio de inteligência artificial
+     * Substring que o dado deve conter no final. Configurado pelo
+     * método endswith(). Null significa que a regra não foi
+     * configurada.
      *
      * @var string|null
      */
@@ -210,7 +213,11 @@ final class Validator
      * configuradas através dos métodos fluentes disponíveis antes de
      * chamar validate().
      *
-     * Documentação gerada com auxílio de inteligência artificial
+     * Exemplo:
+     *
+     * ```php
+     * $validator = new Validator();
+     * ```
      */
     public function __construct()
     {
@@ -221,10 +228,18 @@ final class Validator
      *
      * Armazena o dado internamente, executa cada método checkXxx()
      * responsável por testar uma regra específica e retorna se todas as
-     * regras configuradas passaram (ou seja, se não houve nenhuma falha
-     * em failed()).
+     * regras configuradas passaram (isto é, se failed() retornar um
+     * array vazio).
      *
-     * Documentação gerada com auxílio de inteligência artificial
+     * Exemplo:
+     *
+     * ```php
+     * $validator = (new Validator())->required()->type(Types::INT);
+     *
+     * var_dump($validator->validate(42));  // true
+     * var_dump($validator->validate('a')); // false (falhou a regra type)
+     * var_dump($validator->failed());      // ['type' => false]
+     * ```
      *
      * @param mixed $data Dado a ser validado.
      * @return bool Retorna true se todas as regras configuradas
@@ -261,7 +276,13 @@ final class Validator
      * 'startswith', 'endswith') e cada valor pode ser true (passou),
      * false (falhou) ou null (regra não configurada/não testada).
      *
-     * Documentação gerada com auxílio de inteligência artificial
+     * Exemplo:
+     *
+     * ```php
+     * $validator = (new Validator())->required()->validate('abc');
+     * print_r($validator->result());
+     * // ['required' => true, 'empty' => null, 'nullable' => null, ...]
+     * ```
      *
      * @return array<string, ?bool> Array associativo com o resultado de cada regra.
      */
@@ -273,42 +294,41 @@ final class Validator
     /**
      * Retorna apenas as regras que passaram na última validação.
      *
-     * Filtra o array de resultado mantendo somente os valores
-     * considerados "truthy" (ou seja, o resultado true).
+     * Retorna os nomes (chaves) das regras cujo resultado foi
+     * estritamente true. Regras não configuradas (null) não aparecem.
      *
-     * Documentação gerada com auxílio de inteligência antificial
+     * Exemplo:
      *
-     * @return array<string> Array associativo apenas com as regras que
-     *               passaram.
+     * ```php
+     * $validator = (new Validator())->required()->min(3)->validate('abc');
+     * print_r($validator->passed()); // ['required', 'min']
+     * ```
+     *
+     * @return array<string> Array com os nomes das regras que passaram.
      */
     public function passed(): array
     {
-        /* return array_keys(array_filter($this->result, function (?bool $result): bool {
-            if (is_null($result)) {
-                return false;
-            }
-            return $result;
-        })); */
         return array_keys($this->result, true, true);
     }
     
     /**
      * Retorna apenas as regras que falharam na última validação.
      *
-     * Regras não configuradas (valor null no resultado) não são
-     * consideradas falhas e são ignoradas. Somente regras cujo
-     * resultado seja estritamente false são retornadas.
+     * Retorna os nomes (chaves) das regras cujo resultado foi
+     * estritamente false. Regras não configuradas (valor null) não são
+     * consideradas falhas e não aparecem no retorno.
      *
-     * Documentação gerada com auxílio de inteligência artificial
+     * Exemplo:
      *
-     * @return array<string> Array associativo apenas com as regras que
-     *               falharam.
+     * ```php
+     * $validator = (new Validator())->type(Types::INT)->validate('texto');
+     * print_r($validator->failed()); // ['type']
+     * ```
+     *
+     * @return array<string> Array com os nomes das regras que falharam.
      */
     public function failed(): array
     {
-        /* return array_keys(array_filter($this->result, function (?bool $result): bool {
-            return !$result;
-        })); */
         return array_keys($this->result, false, true);
     }
 
@@ -316,10 +336,16 @@ final class Validator
      * Configura a regra de obrigatoriedade do dado.
      *
      * Quando $required for true, o dado não poderá ser nulo nem ter
-     * comprimento zero. Quando $required for false, a regra não
-     * realiza nenhuma verificação adicional.
+     * comprimento zero (mb_strlen() === 0). Quando $required for
+     * false, nenhuma verificação adicional é realizada.
      *
-     * Documentação gerada com auxílio de inteligência artificial
+     * Exemplos:
+     *
+     * ```php
+     * (new Validator())->required()->validate('abc'); // true
+     * (new Validator())->required()->validate(null);  // false
+     * (new Validator())->required()->validate('');    // false
+     * ```
      *
      * @param bool $required Se o dado é obrigatório. Padrão: true.
      * @return self Instância atual, para encadeamento de métodos.
@@ -337,8 +363,6 @@ final class Validator
      * foi configurada (null), o resultado permanece null. Se
      * $required for true, o dado não pode ser nulo nem ter comprimento
      * (mb_strlen) igual a zero.
-     *
-     * Documentação gerada com auxílio de inteligência artificial
      *
      * @return void
      */
@@ -364,11 +388,6 @@ final class Validator
             };
             return;
         }
-
-        /* if($this->required === false) {
-            // Não testa porque não é requerido
-            return;
-        } */
     }
 
     /**
@@ -378,7 +397,18 @@ final class Validator
      * nulo. Quando $empty for false, o dado não pode ser nulo nem
      * vazio (array vazio ou string/valor com comprimento zero).
      *
-     * Documentação gerada com auxílio de inteligência artificial
+     * Exemplos:
+     *
+     * ```php
+     * // Com empty(true): o dado pode ser vazio, mas não nulo.
+     * (new Validator())->empty()->validate('');    // true
+     * (new Validator())->empty()->validate(null);  // false
+     *
+     * // Com empty(false): o dado não pode ser nulo nem vazio.
+     * (new Validator())->empty(false)->validate([]);   // false
+     * (new Validator())->empty(false)->validate('');   // false
+     * (new Validator())->empty(false)->validate('ok'); // true
+     * ```
      *
      * @param bool $empty Se o dado pode ser vazio. Padrão: true.
      * @return self Instância atual, para encadeamento de métodos.
@@ -394,10 +424,9 @@ final class Validator
      *
      * Armazena o resultado em $this->result['empty']. Se a regra não
      * foi configurada (null), o resultado permanece null. Quando
-     * $empty for false, verifica se o dado é um array vazio ou possui
-     * comprimento (mb_strlen) igual a zero.
-     *
-     * Documentação gerada com auxílio de inteligência artificial
+     * $empty for true, apenas verifica se o dado não é nulo. Quando
+     * $empty for false, verifica também se o dado é um array vazio ou
+     * possui comprimento (mb_strlen) igual a zero.
      *
      * @return void
      */
@@ -422,7 +451,6 @@ final class Validator
         }
 
         // Não pode ser vazio...
-        // if($this->empty === false) {
             // ... também não pode ser nulo.
         if (is_null($this->data)) {
             $this->result['empty'] = false;
@@ -440,13 +468,22 @@ final class Validator
             $this->result['empty'] = false;
             return;
         }
-        // }
     }
 
     /**
      * Configura a regra que define se o dado pode ser nulo.
      *
-     * Documentação gerada com auxílio de inteligência artificial
+     * Quando $nullable for true, o dado pode ser nulo (a regra passa
+     * sem teste adicional). Quando $nullable for false, o dado não
+     * pode ser nulo.
+     *
+     * Exemplos:
+     *
+     * ```php
+     * (new Validator())->nullable()->validate(null);      // true
+     * (new Validator())->nullable(false)->validate(null); // false
+     * (new Validator())->nullable(false)->validate('x');  // true
+     * ```
      *
      * @param bool $nullable Se o dado pode ser nulo. Padrão: true.
      * @return self Instância atual, para encadeamento de métodos.
@@ -463,8 +500,6 @@ final class Validator
      * Armazena o resultado em $this->result['nullable']. Se a regra não
      * foi configurada (null), o resultado permanece null. Quando
      * $nullable for false, o dado não pode ser nulo.
-     *
-     * Documentação gerada com auxílio de inteligência artificial
      *
      * @return void
      */
@@ -484,19 +519,24 @@ final class Validator
         }
 
         // Não pode ser nulo
-        // if($this->nullable === false) {
         if (is_null($this->data)) {
             $this->result['nullable'] = false;
         }
-            // return;
-        // }
     }
 
     /**
      * Configura a regra de verificação de tipo do dado, de acordo com
      * o enum Types.
      *
-     * Documentação gerada com auxílio de inteligência artificial
+     * Exemplos:
+     *
+     * ```php
+     * (new Validator())->type(Types::INT)->validate(10);      // true
+     * (new Validator())->type(Types::INT)->validate('10');    // false
+     * (new Validator())->type(Types::STRING)->validate('a');  // true
+     * (new Validator())->type(Types::ARRAY)->validate([]);    // true
+     * (new Validator())->type(Types::BOOL)->validate(null);   // false (dado nulo falha sempre)
+     * ```
      *
      * @param Types $type Tipo esperado para o dado.
      * @return self Instância atual, para encadeamento de métodos.
@@ -516,8 +556,6 @@ final class Validator
      * correspondente ao caso do enum Types informado (is_bool,
      * is_numeric, is_int, is_float, is_string, is_array, is_object,
      * is_resource ou is_callable).
-     *
-     * Documentação gerada com auxílio de inteligência artificial
      *
      * @return void
      */
@@ -578,7 +616,21 @@ final class Validator
      * Configura a regra que verifica se o dado é uma instância da
      * classe informada.
      *
-     * Documentação gerada com auxílio de inteligência artificial
+     * Atenção: a comparação é EXATA (o nome da classe do dado deve ser
+     * idêntico ao informado). Instâncias de subclasses da classe
+     * informada NÃO passam na validação. Para verificar herança, use
+     * `assert($dado instanceof MinhaClasse)` ou outra abordagem.
+     *
+     * Exemplos:
+     *
+     * ```php
+     * class Animal {}
+     * class Cachorro extends Animal {}
+     *
+     * (new Validator())->is(Animal::class)->validate(new Animal());  // true
+     * (new Validator())->is(Animal::class)->validate(new Cachorro()); // false!
+     * (new Validator())->is(DateTime::class)->validate(new DateTime()); // true
+     * ```
      *
      * @param string $className Nome completo (com namespace) da classe
      *                           esperada.
@@ -596,9 +648,7 @@ final class Validator
      * Armazena o resultado em $this->result['is']. Se a regra não foi
      * configurada (null), o resultado permanece null. Utiliza
      * get_class() sobre o dado e compara com o nome de classe
-     * informado.
-     *
-     * Documentação gerada com auxílio de inteligência artificial
+     * informado (comparação exata, sem considerar subclasses).
      *
      * @return void
      */
@@ -618,11 +668,28 @@ final class Validator
     /**
      * Configura o valor mínimo aceito para o dado.
      *
-     * Pode ser um número (comparado diretamente), uma string (comparada
-     * pelo comprimento via mb_strlen) ou uma data/hora
+     * Pode ser um número (comparado diretamente), uma string (quando o
+     * dado também é string, compara o comprimento do dado com o
+     * comprimento ou o valor numérico do limite) ou uma data/hora
      * (DateTimeInterface, comparada diretamente).
      *
-     * Documentação gerada com auxílio de inteligência artificial
+     * Exemplos:
+     *
+     * ```php
+     * // Dado numérico: compara o valor.
+     * (new Validator())->min(10)->validate(15); // true
+     * (new Validator())->min(10)->validate(5);  // false
+     *
+     * // Dado string: compara o comprimento com o valor do limite.
+     * (new Validator())->min(3)->validate('abcd');  // true (4 >= 3)
+     * (new Validator())->min(3)->validate('ab');    // false (2 < 3)
+     * (new Validator())->min('xyz')->validate('abcdef'); // true (6 >= 3)
+     *
+     * // Dado data/hora: compara as datas.
+     * $hoje = new DateTimeImmutable();
+     * (new Validator())->min(new DateTimeImmutable('2000-01-01'))
+     *     ->validate($hoje); // true
+     * ```
      *
      * @param int|float|string|DateTimeInterface $min Valor mínimo
      *        aceito.
@@ -642,8 +709,6 @@ final class Validator
      * numérico, compara o valor diretamente; se for string, compara o
      * comprimento (mb_strlen); caso contrário, assume comparação de
      * data/hora.
-     *
-     * Documentação gerada com auxílio de inteligência artificial
      *
      * @return void
      */
@@ -679,11 +744,27 @@ final class Validator
     /**
      * Configura o valor máximo aceito para o dado.
      *
-     * Pode ser um número (comparado diretamente), uma string (comparada
-     * pelo comprimento via mb_strlen) ou uma data/hora
+     * Pode ser um número (comparado diretamente), uma string (quando o
+     * dado também é string, compara o comprimento do dado com o
+     * comprimento ou o valor numérico do limite) ou uma data/hora
      * (DateTimeInterface, comparada diretamente).
      *
-     * Documentação gerada com auxílio de inteligência artificial
+     * Exemplos:
+     *
+     * ```php
+     * // Dado numérico: compara o valor.
+     * (new Validator())->max(100)->validate(50);  // true
+     * (new Validator())->max(100)->validate(150); // false
+     *
+     * // Dado string: compara o comprimento.
+     * (new Validator())->max(5)->validate('abc');  // true (3 <= 5)
+     * (new Validator())->max(2)->validate('abc');  // false (3 > 2)
+     * (new Validator())->max('abcd')->validate('ab'); // true (2 <= 4)
+     *
+     * // Dado data/hora: compara as datas.
+     * (new Validator())->max(new DateTimeImmutable('2030-01-01'))
+     *     ->validate(new DateTimeImmutable()); // true
+     * ```
      *
      * @param int|float|string|DateTimeInterface $max Valor máximo
      *        aceito.
@@ -703,8 +784,6 @@ final class Validator
      * numérico, compara o valor diretamente; se for string, compara o
      * comprimento (mb_strlen); caso contrário, assume comparação de
      * data/hora.
-     *
-     * Documentação gerada com auxílio de inteligência artificial
      *
      * @return void
      */
@@ -740,10 +819,27 @@ final class Validator
     /**
      * Configura o intervalo (inclusivo) aceito para o dado.
      *
-     * $down e $up devem ser do mesmo tipo, caso contrário uma exceção
-     * RuntimeException é lançada.
+     * $down e $up devem ser exatamente do mesmo tipo (verificado com
+     * gettype()); caso contrário, uma RuntimeException é lançada
+     * IMEDIATAMENTE ao chamar between(), antes mesmo de validate()
+     * ser executado.
      *
-     * Documentação gerada com auxílio de inteligência artificial
+     * Os limites são inclusivos: valores iguais aos limites passam na
+     * validação.
+     *
+     * Exemplos:
+     *
+     * ```php
+     * (new Validator())->between(1, 10)->validate(5);   // true
+     * (new Validator())->between(1, 10)->validate(10);  // true (inclusivo)
+     * (new Validator())->between(1, 10)->validate(11);  // false
+     *
+     * // Dado string: compara o comprimento com os limites.
+     * (new Validator())->between(2, 5)->validate('abc'); // true (3)
+     *
+     * // Erro em tempo de configuração:
+     * (new Validator())->between(1, '10'); // lança RuntimeException
+     * ```
      *
      * @param int|float|string|DateTimeInterface $down Limite inferior
      *        do intervalo.
@@ -773,8 +869,6 @@ final class Validator
      * permanece null. Se o dado for numérico, compara o valor
      * diretamente; se for string, compara o comprimento (mb_strlen);
      * caso contrário, assume comparação de data/hora.
-     *
-     * Documentação gerada com auxílio de inteligência artificial
      *
      * @return void
      */
@@ -812,10 +906,21 @@ final class Validator
      * que o dado deve conter.
      *
      * Se $contains for um array, o dado deve estar presente nesse
-     * array (comparação exata, via in_array). Se $contains for uma
-     * string, o dado deve conter essa substring (via str_contains).
+     * array (verificado com in_array, sem comparação estrita). Se
+     * $contains for uma string, o dado deve conter essa substring
+     * (verificado com str_contains).
      *
-     * Documentação gerada com auxílio de inteligência artificial
+     * Exemplos:
+     *
+     * ```php
+     * // String: o dado deve conter a substring.
+     * (new Validator())->contains('@')->validate('user@example.com'); // true
+     * (new Validator())->contains('foo')->validate('bar');            // false
+     *
+     * // Array: o dado deve estar presente na lista.
+     * (new Validator())->contains(['a', 'b', 'c'])->validate('b'); // true
+     * (new Validator())->contains(['a', 'b', 'c'])->validate('z'); // false
+     * ```
      *
      * @param string|array<mixed> $contains Valor ou lista de valores que o
      *        dado deve conter.
@@ -831,9 +936,10 @@ final class Validator
      * Testa a regra de contenção configurada em $contains.
      *
      * Armazena o resultado em $this->result['contains']. Se a regra não
-     * foi configurada (null), o resultado permanece null.
-     *
-     * Documentação gerada com auxílio de inteligência artificial
+     * foi configurada (null), o resultado permanece null. Quando
+     * $contains é array, verifica se o dado está no array (in_array);
+     * caso contrário, verifica se o dado contém a substring informada
+     * (str_contains).
      *
      * @return void
      */
@@ -852,19 +958,25 @@ final class Validator
         }
 
         // se string
-        // if(is_string($this->contains)) {
-        // @phpstan-ignore argument.type
             $this->result['contains'] = str_contains($this->data, $this->contains);
-        // }
     }
 
     /**
      * Configura a regra que verifica se o dado (um caminho) é um
      * arquivo existente.
      *
-     * A verificação só é realizada quando $file for true.
+     * A verificação só é realizada quando $file for true. Ao passar
+     * false, nenhuma verificação é executada (o resultado permanece
+     * null em result()) — a regra NÃO faz validação negativa.
      *
-     * Documentação gerada com auxílio de inteligência artificial
+     * Exemplos:
+     *
+     * ```php
+     * (new Validator())->file()->validate('/etc/hosts'); // true (é arquivo)
+     * (new Validator())->file()->validate('/tmp');       // false (é diretório)
+     * (new Validator())->file()->validate('/no/existe'); // false (não existe)
+     * (new Validator())->file(false)->validate('/etc');  // null (não testado)
+     * ```
      *
      * @param bool $file Se deve validar o dado como um arquivo
      *        existente.
@@ -879,12 +991,10 @@ final class Validator
     /**
      * Testa a regra configurada em $file.
      *
-     * Armazena o resultado em $this->result['file']. Se a regra não foi
-     * configurada (null) ou for false, o resultado permanece null.
+     * Armazena o resultado em $this->result['file']. Se a regra não
+     * foi configurada (null) ou for false, o resultado permanece null.
      * Utiliza is_file() para verificar se o caminho informado em
      * $data corresponde a um arquivo existente.
-     *
-     * Documentação gerada com auxílio de inteligência artificial
      *
      * @return void
      */
@@ -904,9 +1014,17 @@ final class Validator
      * Configura a regra que verifica se o dado (um caminho) é um
      * diretório existente.
      *
-     * A verificação só é realizada quando $directory for true.
+     * A verificação só é realizada quando $directory for true. Passar
+     * false não gera nenhum teste (o resultado permanece null em
+     * result()).
      *
-     * Documentação gerada com auxílio de inteligência artificial
+     * Exemplos:
+     *
+     * ```php
+     * (new Validator())->directory()->validate('/var/log'); // true (é diretório)
+     * (new Validator())->directory()->validate('/etc/hosts'); // false (é arquivo)
+     * (new Validator())->directory(false)->validate('/etc'); // null (não testado)
+     * ```
      *
      * @param bool $directory Se deve validar o dado como um diretório
      *        existente.
@@ -926,8 +1044,6 @@ final class Validator
      * null. Utiliza is_dir() para verificar se o caminho informado em
      * $data corresponde a um diretório existente.
      *
-     * Documentação gerada com auxílio de inteligência artificial
-     *
      * @return void
      */
     private function checkDirectory(): void
@@ -946,9 +1062,18 @@ final class Validator
      * Configura a regra que verifica se o dado (um caminho) existe no
      * sistema de arquivos.
      *
-     * A verificação só é realizada quando $exists for true.
+     * A verificação só é realizada quando $exists for true. Passar
+     * false não gera nenhum teste (o resultado permanece null em
+     * result()). file_exists() considera arquivos e diretórios, então
+     * esta regra engloba os casos de file() e directory().
      *
-     * Documentação gerada com auxílio de inteligência artificial
+     * Exemplos:
+     *
+     * ```php
+     * (new Validator())->exists()->validate('/etc/hosts'); // true
+     * (new Validator())->exists()->validate('/tmp');       // true (diretório)
+     * (new Validator())->exists()->validate('/no/nope');   // false
+     * ```
      *
      * @param bool $exists Se deve validar a existência do caminho
      *        informado.
@@ -968,8 +1093,6 @@ final class Validator
      * Utiliza file_exists() para verificar se o caminho informado em
      * $data existe (seja arquivo ou diretório).
      *
-     * Documentação gerada com auxílio de inteligência artificial
-     *
      * @return void
      */
     private function checkExists(): void
@@ -987,7 +1110,12 @@ final class Validator
     /**
      * Configura a substring que o dado deve conter no início.
      *
-     * Documentação gerada com auxílio de inteligência artificial
+     * Exemplos:
+     *
+     * ```php
+     * (new Validator())->startswith('https://')->validate('https://proton.me'); // true
+     * (new Validator())->startswith('https://')->validate('http://example.com'); // false
+     * ```
      *
      * @param string $substr Substring esperada no início do dado.
      * @return self Instância atual, para encadeamento de métodos.
@@ -1006,8 +1134,6 @@ final class Validator
      * str_starts_with() para verificar se o dado começa com a
      * substring informada.
      *
-     * Documentação gerada com auxílio de inteligência artificial
-     *
      * @return void
      */
     private function checkStartsWith(): void
@@ -1024,7 +1150,12 @@ final class Validator
     /**
      * Configura a substring que o dado deve conter no final.
      *
-     * Documentação gerada com auxílio de inteligência artificial
+     * Exemplos:
+     *
+     * ```php
+     * (new Validator())->endswith('.pdf')->validate('relatorio.pdf'); // true
+     * (new Validator())->endswith('.pdf')->validate('foto.jpg');      // false
+     * ```
      *
      * @param string $substr Substring esperada no final do dado.
      * @return self Instância atual, para encadeamento de métodos.
@@ -1038,10 +1169,10 @@ final class Validator
     /**
      * Testa a regra configurada em $endswith.
      *
-     * Armazena o resultado em $this->result['endswith']. Se a regra não
-     * foi configurada (null), o resultado permanece null.
-     *
-     * Documentação gerada com auxílio de inteligência artificial
+     * Armazena o resultado em $this->result['endswith']. Se a regra
+     * não foi configurada (null), o resultado permanece null. Utiliza
+     * str_ends_with() para verificar se o dado termina com a substring
+     * informada.
      *
      * @return void
      */
