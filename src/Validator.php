@@ -3,6 +3,7 @@
 namespace Ptk\Validator;
 
 use DateTimeInterface;
+use RuntimeException;
 
 /**
  * Utilitário para validar valores em variáveis PHP, através de uma
@@ -37,11 +38,16 @@ use DateTimeInterface;
  * @package Ptk\Validator
  * @author  Everton da Rosa <everton3x@gmail.com>
  * @license MIT
+ *
+ * @phpstan-type RuleResult bool|null
+ * @phpstan-type ResultMap array<string, RuleResult>
  */
 final class Validator
 {
     /**
      * O valor que está sendo validado, definido em validate().
+     *
+     * @var mixed
      */
     private mixed $data;
 
@@ -51,36 +57,48 @@ final class Validator
      *
      * As chaves são os nomes das regras
      * (ex.: 'required', 'type', 'leq', etc.).
+     *
+     * @var ResultMap
      */
     private array $result = [];
 
     /**
      * Configuração da regra required (obrigatoriedade do valor).
      * Null significa que a regra não foi configurada.
+     *
+     * @var bool|null
      */
     private ?bool $required = null;
 
     /**
      * Configuração da regra empty (se o valor pode ser vazio).
      * Null significa que a regra não foi configurada.
+     *
+     * @var bool|null
      */
     private ?bool $empty = null;
 
     /**
      * Configuração da regra nullable (se o valor pode ser nulo).
      * Null significa que a regra não foi configurada.
+     *
+     * @var bool|null
      */
     private ?bool $nullable = null;
 
     /**
      * Tipo esperado do valor, definido pela regra type().
      * Null significa que a regra não foi configurada.
+     *
+     * @var Types|null
      */
     private ?Types $type = null;
 
     /**
      * Nome da classe esperada para o valor, definido pela regra is().
      * Null significa que a regra não foi configurada.
+     *
+     * @var string|null
      */
     private ?string $is = null;
 
@@ -88,12 +106,17 @@ final class Validator
      * Valor limite superior (inclusivo) da regra lessOrEqual()
      * para comparações numéricas, de comprimento, de tamanho de
      * array e de data/hora.
+     *
+     * @var int|float|string|array<array-key, mixed>|DateTimeInterface|null
      */
     private null|int|float|string|array|DateTimeInterface $leq = null;
+
     /**
      * Valor limite superior (exclusivo) da regra less()
      * para comparações numéricas, de comprimento, de tamanho de
      * array e de data/hora.
+     *
+     * @var int|float|string|array<array-key, mixed>|DateTimeInterface|null
      */
     private null|int|float|string|array|DateTimeInterface $less = null;
 
@@ -101,28 +124,39 @@ final class Validator
      * Valor limite inferior (inclusivo) da regra greatOrEqual()
      * para comparações numéricas, de comprimento, de tamanho de
      * array e de data/hora.
+     *
+     * @var int|float|string|array<array-key, mixed>|DateTimeInterface|null
      */
     private null|int|float|string|array|DateTimeInterface $geq = null;
+
     /**
      * Valor limite inferior (exclusivo) da regra great()
      * para comparações numéricas, de comprimento, de tamanho de
      * array e de data/hora.
+     *
+     * @var int|float|string|array<array-key, mixed>|DateTimeInterface|null
      */
     private null|int|float|string|array|DateTimeInterface $great = null;
 
     /**
      * Limite inferior do intervalo configurado pela regra between().
+     *
+     * @var int|float|string|DateTimeInterface|null
      */
     private null|int|float|string|DateTimeInterface $betweenDown = null;
 
     /**
      * Limite superior do intervalo configurado pela regra between().
+     *
+     * @var int|float|string|DateTimeInterface|null
      */
     private null|int|float|string|DateTimeInterface $betweenUp = null;
 
     /**
      * Valor (string) ou lista de valores (array) que o valor
      * validado deve conter, configurado pela regra contains().
+     *
+     * @var array<array-key, mixed>|string|null
      */
     private null|array|string $contains = null;
 
@@ -130,6 +164,8 @@ final class Validator
      * Configuração da regra file (valida se o valor é um caminho
      * de arquivo existente). Null significa que a regra não foi
      * configurada.
+     *
+     * @var bool|null
      */
     private ?bool $file = null;
 
@@ -137,6 +173,8 @@ final class Validator
      * Configuração da regra directory (valida se o valor é um
      * caminho de diretório existente). Null significa que a regra
      * não foi configurada.
+     *
+     * @var bool|null
      */
     private ?bool $directory = null;
 
@@ -144,6 +182,8 @@ final class Validator
      * Configuração da regra exists (valida se o valor é um caminho
      * que existe no sistema de arquivos). Null significa que a
      * regra não foi configurada.
+     *
+     * @var bool|null
      */
     private ?bool $exists = null;
 
@@ -151,6 +191,8 @@ final class Validator
      * Substring com que o valor (string) deve começar,
      * configurada pela regra startswith(). Null significa que a
      * regra não foi configurada.
+     *
+     * @var string|null
      */
     private ?string $startswith = null;
 
@@ -158,9 +200,10 @@ final class Validator
      * Substring com que o valor (string) deve terminar,
      * configurada pela regra endswith(). Null significa que a
      * regra não foi configurada.
+     *
+     * @var string|null
      */
     private ?string $endswith = null;
-
 
     /**
      * Construtor da classe Validator.
@@ -186,67 +229,53 @@ final class Validator
      * com resultado null em result().
      *
      * @param mixed $data O valor a ser validado.
+     *
      * @return bool True se nenhuma regra configurada falhou; caso contrário, false.
      */
     public function validate(mixed $data): bool
     {
         $this->data = $data;
-        
-        if($this->required) $this->checkRequired();
-        
-        if(!is_null($this->empty) && is_string($this->data)) $this->checkEmptyStr();
-        if(!is_null($this->empty) && is_array($this->data)) $this->checkEmptyArray();
-        
-        if(!is_null($this->nullable)) $this->checkNullable();
-        
-        if(!is_null($this->type)) $this->checkType();
 
-        if(!is_null($this->is) && is_object($this->data)) $this->checkIs();
-        
-        if(is_int($this->leq) && is_string($this->data)) $this->checkLeqIntStr();
-        if(is_string($this->leq) && is_string($this->data)) $this->checkLeqStrStr();
-        if(is_array($this->leq) && is_array($this->data)) $this->checkLeqArrayArray();
-        if(is_int($this->leq) && is_array($this->data)) $this->checkLeqIntArray();
-        if(is_numeric($this->leq) && is_numeric($this->data)) $this->checkLeqNumeric();
-        if(($this->leq instanceof DateTimeInterface) && ($this->data instanceof DateTimeInterface)) $this->checkLeqDateTime();
-        
-        if(is_int($this->less) && is_string($this->data)) $this->checkLessIntStr();
-        if(is_string($this->less) && is_string($this->data)) $this->checkLessStrStr();
-        if(is_array($this->less) && is_array($this->data)) $this->checkLessArrayArray();
-        if(is_int($this->less) && is_array($this->data)) $this->checkLessIntArray();
-        if(is_numeric($this->less) && is_numeric($this->data)) $this->checkLessNumeric();
-        if(($this->less instanceof DateTimeInterface) && ($this->data instanceof DateTimeInterface)) $this->checkLessDateTime();
-
-        if(is_int($this->geq) && is_string($this->data)) $this->checkGeqIntStr();
-        if(is_string($this->geq) && is_string($this->data)) $this->checkGeqStrStr();
-        if(is_array($this->geq) && is_array($this->data)) $this->checkGeqArrayArray();
-        if(is_int($this->geq) && is_array($this->data)) $this->checkGeqIntArray();
-        if(is_numeric($this->geq) && is_numeric($this->data)) $this->checkGeqNumeric();
-        if(($this->geq instanceof DateTimeInterface) && ($this->data instanceof DateTimeInterface)) $this->checkGeqDateTime();
-
-        if(is_int($this->great) && is_string($this->data)) $this->checkGreatIntStr();
-        if(is_string($this->great) && is_string($this->data)) $this->checkGreatStrStr();
-        if(is_array($this->great) && is_array($this->data)) $this->checkGreatArrayArray();
-        if(is_int($this->great) && is_array($this->data)) $this->checkGreatIntArray();
-        if(is_numeric($this->great) && is_numeric($this->data)) $this->checkGreatNumeric();
-        if(($this->great instanceof DateTimeInterface) && ($this->data instanceof DateTimeInterface)) $this->checkGreatDateTime();
-
-        if(!is_null($this->betweenDown) && !is_null($this->betweenUp) && !is_string($this->data)) $this->checkBetween();
-        if(!is_null($this->betweenDown) && !is_null($this->betweenUp) && is_string($this->data)) $this->checkBetweenIntStr();
-        if(is_string($this->betweenDown) && is_string($this->betweenUp) && is_string($this->data)) $this->checkBetweenStrStr();
-
-        if(!is_null($this->contains) && is_array($this->data)) $this->checkContainsArray();
-        if(!is_null($this->contains) && is_string($this->data)) $this->checkContainsStr();
-
-        if($this->file && is_string($this->data)) $this->checkFile();
-        
-        if($this->directory && is_string($this->data)) $this->checkDirectory();
-        
-        if($this->exists && is_string($this->data)) $this->checkExists();
-        
-        if(is_string($this->startswith) && is_string($this->data)) $this->checkStartsWith();
-        
-        if(is_string($this->endswith) && is_string($this->data)) $this->checkEndsWith();
+        if ($this->required) $this->checkRequired();
+        if (!is_null($this->empty) && is_string($this->data)) $this->checkEmptyStr();
+        if (!is_null($this->empty) && is_array($this->data)) $this->checkEmptyArray();
+        if (!is_null($this->nullable)) $this->checkNullable();
+        if (!is_null($this->type)) $this->checkType();
+        if (!is_null($this->is) && is_object($this->data)) $this->checkIs();
+        if (is_int($this->leq) && is_string($this->data)) $this->checkLeqIntStr();
+        if (is_string($this->leq) && is_string($this->data)) $this->checkLeqStrStr();
+        if (is_array($this->leq) && is_array($this->data)) $this->checkLeqArrayArray();
+        if (is_int($this->leq) && is_array($this->data)) $this->checkLeqIntArray();
+        if (is_numeric($this->leq) && is_numeric($this->data)) $this->checkLeqNumeric();
+        if (($this->leq instanceof DateTimeInterface) && ($this->data instanceof DateTimeInterface)) $this->checkLeqDateTime();
+        if (is_int($this->less) && is_string($this->data)) $this->checkLessIntStr();
+        if (is_string($this->less) && is_string($this->data)) $this->checkLessStrStr();
+        if (is_array($this->less) && is_array($this->data)) $this->checkLessArrayArray();
+        if (is_int($this->less) && is_array($this->data)) $this->checkLessIntArray();
+        if (is_numeric($this->less) && is_numeric($this->data)) $this->checkLessNumeric();
+        if (($this->less instanceof DateTimeInterface) && ($this->data instanceof DateTimeInterface)) $this->checkLessDateTime();
+        if (is_int($this->geq) && is_string($this->data)) $this->checkGeqIntStr();
+        if (is_string($this->geq) && is_string($this->data)) $this->checkGeqStrStr();
+        if (is_array($this->geq) && is_array($this->data)) $this->checkGeqArrayArray();
+        if (is_int($this->geq) && is_array($this->data)) $this->checkGeqIntArray();
+        if (is_numeric($this->geq) && is_numeric($this->data)) $this->checkGeqNumeric();
+        if (($this->geq instanceof DateTimeInterface) && ($this->data instanceof DateTimeInterface)) $this->checkGeqDateTime();
+        if (is_int($this->great) && is_string($this->data)) $this->checkGreatIntStr();
+        if (is_string($this->great) && is_string($this->data)) $this->checkGreatStrStr();
+        if (is_array($this->great) && is_array($this->data)) $this->checkGreatArrayArray();
+        if (is_int($this->great) && is_array($this->data)) $this->checkGreatIntArray();
+        if (is_numeric($this->great) && is_numeric($this->data)) $this->checkGreatNumeric();
+        if (($this->great instanceof DateTimeInterface) && ($this->data instanceof DateTimeInterface)) $this->checkGreatDateTime();
+        if (!is_null($this->betweenDown) && !is_null($this->betweenUp) && !is_string($this->data)) $this->checkBetween();
+        if (!is_null($this->betweenDown) && !is_null($this->betweenUp) && is_string($this->data)) $this->checkBetweenIntStr();
+        if (is_string($this->betweenDown) && is_string($this->betweenUp) && is_string($this->data)) $this->checkBetweenStrStr();
+        if (!is_null($this->contains) && is_array($this->data)) $this->checkContainsArray();
+        if (!is_null($this->contains) && is_string($this->data)) $this->checkContainsStr();
+        if ($this->file && is_string($this->data)) $this->checkFile();
+        if ($this->directory && is_string($this->data)) $this->checkDirectory();
+        if ($this->exists && is_string($this->data)) $this->checkExists();
+        if (is_string($this->startswith) && is_string($this->data)) $this->checkStartsWith();
+        if (is_string($this->endswith) && is_string($this->data)) $this->checkEndsWith();
 
         return empty($this->failed());
     }
@@ -261,7 +290,7 @@ final class Validator
      * - false: a regra falhou;
      * - null: a regra não foi configurada, portanto não foi testada.
      *
-     * @return array<string, bool|null> O resultado completo das regras.
+     * @return ResultMap O resultado completo das regras.
      */
     public function result(): array
     {
@@ -273,23 +302,25 @@ final class Validator
      *
      * Regras não configuradas (resultado null) não são incluídas.
      *
-     * @return array<int, string> Lista com os nomes das regras aprovadas.
+     * @return list<string> Lista com os nomes das regras aprovadas.
      */
     public function passed(): array
     {
+        /** @var list<string> */
         return array_keys($this->result, true, true);
     }
-    
+
     /**
      * Retorna os nomes das regras configuradas que falharam na validação.
      *
      * Regras não configuradas (resultado null) não são consideradas
      * falhas e não são incluídas.
      *
-     * @return array<int, string> Lista com os nomes das regras reprovadas.
+     * @return list<string> Lista com os nomes das regras reprovadas.
      */
     public function failed(): array
     {
+        /** @var list<string> */
         return array_keys($this->result, false, true);
     }
 
@@ -299,6 +330,7 @@ final class Validator
      *
      * @param bool $required Se true (padrão), o valor é obrigatório;
      *                       se false, a regra não impõe obrigatoriedade.
+     *
      * @return self Retorna a própria instância para permitir encadeamento de regras.
      */
     public function required(bool $required = true): self
@@ -313,11 +345,13 @@ final class Validator
      * O valor falha se for nulo ou vazio (verificação com empty()),
      * ou seja, se for null, '', [], 0, '0', false, etc.
      * O resultado é registrado em result() sob a chave 'required'.
+     *
+     * @return void
      */
     private function checkRequired(): void
-    {   
+    {
         $this->result['required'] = true;
-        if(is_null($this->data) || empty($this->data)){
+        if (is_null($this->data) || empty($this->data)) {
             $this->result['required'] = false;
         }
     }
@@ -333,6 +367,7 @@ final class Validator
      * ou array.
      *
      * @param bool $empty Se true, permite valor vazio; se false, não permite.
+     *
      * @return self Retorna a própria instância para permitir encadeamento de regras.
      */
     public function empty(bool $empty = true): self
@@ -347,12 +382,13 @@ final class Validator
      * Falha apenas quando a regra exige valor não vazio
      * (empty(false)) e o valor é uma string vazia ('').
      * O resultado é registrado em result() sob a chave 'empty'.
+     *
+     * @return void
      */
     private function checkEmptyStr(): void
     {
         $this->result['empty'] = true;
-
-        if(!$this->empty && $this->data === '') {
+        if (!$this->empty && $this->data === '') {
             $this->result['empty'] = false;
         }
     }
@@ -363,16 +399,16 @@ final class Validator
      * Falha apenas quando a regra exige valor não vazio
      * (empty(false)) e o valor é um array vazio ([]).
      * O resultado é registrado em result() sob a chave 'empty'.
+     *
+     * @return void
      */
     private function checkEmptyArray(): void
     {
         $this->result['empty'] = true;
-
-        if(!$this->empty && $this->data === []) {
+        if (!$this->empty && $this->data === []) {
             $this->result['empty'] = false;
             return;
         }
-
     }
 
     /**
@@ -380,6 +416,7 @@ final class Validator
      *
      * @param bool $nullable Se true (padrão), permite valor nulo;
      *                       se false, o valor não pode ser nulo.
+     *
      * @return self Retorna a própria instância para permitir encadeamento de regras.
      */
     public function nullable(bool $nullable = true): self
@@ -394,11 +431,13 @@ final class Validator
      * Falha apenas quando valores nulos não são permitidos
      * (nullable(false)) e o valor é nulo.
      * O resultado é registrado em result() sob a chave 'nullable'.
+     *
+     * @return void
      */
     private function checkNullable(): void
     {
         $this->result['nullable'] = true;
-        if(!$this->nullable && is_null($this->data)) {
+        if (!$this->nullable && is_null($this->data)) {
             $this->result['nullable'] = false;
         }
     }
@@ -411,6 +450,7 @@ final class Validator
      * caso do enum informado.
      *
      * @param Types $type O tipo esperado do valor.
+     *
      * @return self Retorna a própria instância para permitir encadeamento de regras.
      */
     public function type(Types $type): self
@@ -427,6 +467,8 @@ final class Validator
      * (is_bool(), is_numeric(), is_int(), is_float(), is_string(),
      * is_array(), is_object(), is_resource() e is_callable()).
      * O resultado é registrado em result() sob a chave 'type'.
+     *
+     * @return void
      */
     private function checkType(): void
     {
@@ -470,7 +512,8 @@ final class Validator
      *
      * A verificação só é executada se o valor for um objeto.
      *
-     * @param string $className O nome completo da classe esperada.
+     * @param class-string $className O nome completo da classe esperada.
+     *
      * @return self Retorna a própria instância para permitir encadeamento de regras.
      */
     public function is(string $className): self
@@ -487,10 +530,12 @@ final class Validator
      * e o nome da classe configurado, sem considerar herança
      * (não usa instanceof). O resultado é registrado em result()
      * sob a chave 'is'.
+     *
+     * @return void
      */
     private function checkIs(): void
     {
-        $this->result['is'] = get_class($this->data) === $this->is;
+        if(is_object($this->data)) $this->result['is'] = get_class($this->data) === $this->is;
     }
 
     /**
@@ -500,7 +545,8 @@ final class Validator
      * comparados por valor, strings pelo comprimento (mb_strlen),
      * arrays pelo número de elementos e datas/horas entre si.
      *
-     * @param int|float|string|array|DateTimeInterface $value O valor limite superior inclusivo.
+     * @param int|float|string|array<array-key, mixed>|DateTimeInterface $value O valor limite superior inclusivo.
+     *
      * @return self Retorna a própria instância para permitir encadeamento de regras.
      */
     public function lessOrEqual(int|float|string|array|DateTimeInterface $value): self
@@ -513,35 +559,43 @@ final class Validator
      * Verifica a regra lessOrEqual() quando o limite é int e o
      * valor é string: compara o comprimento da string (mb_strlen)
      * com o limite (<=).
+     *
+     * @return void
      */
     private function checkLeqIntStr(): void
     {
-        $this->result['leq'] = (mb_strlen($this->data) <= $this->leq);
+        if(is_string($this->data)) $this->result['leq'] = (mb_strlen($this->data) <= $this->leq);
     }
-    
+
     /**
      * Verifica a regra lessOrEqual() quando o limite e o valor são
      * strings: compara o comprimento do valor (mb_strlen) com o
      * comprimento do limite (<=).
+     *
+     * @return void
      */
     private function checkLeqStrStr(): void
     {
-        $this->result['leq'] = (mb_strlen($this->data) <= mb_strlen($this->leq));
+        if(is_string($this->leq) && is_string($this->data)) $this->result['leq'] = (mb_strlen($this->data) <= mb_strlen($this->leq));
     }
 
     /**
      * Verifica a regra lessOrEqual() quando o limite é int e o
      * valor é array: compara o número de elementos do array com o
      * limite (<=).
+     *
+     * @return void
      */
     private function checkLeqIntArray(): void
     {
-        $this->result['leq'] = (sizeof($this->data) <= $this->leq);
+        if(is_array($this->data)) $this->result['leq'] = (sizeof($this->data) <= $this->leq);
     }
-    
+
     /**
      * Verifica a regra lessOrEqual() quando o limite e o valor são
      * numéricos: compara os valores diretamente (<=).
+     *
+     * @return void
      */
     private function checkLeqNumeric(): void
     {
@@ -552,16 +606,20 @@ final class Validator
      * Verifica a regra lessOrEqual() quando o limite e o valor são
      * arrays: compara o número de elementos do valor com o número
      * de elementos do limite (<=).
+     *
+     * @return void
      */
     private function checkLeqArrayArray(): void
     {
-        $this->result['leq'] = (sizeof($this->data) <= sizeof($this->leq));
+        if(is_array($this->leq) && is_array($this->data)) $this->result['leq'] = (sizeof($this->data) <= sizeof($this->leq));
     }
-    
+
     /**
      * Verifica a regra lessOrEqual() quando o limite e o valor são
      * instâncias de DateTimeInterface: compara as datas/horas
      * entre si (<=).
+     *
+     * @return void
      */
     private function checkLeqDateTime(): void
     {
@@ -578,7 +636,8 @@ final class Validator
      * Obs.: para valores do tipo data/hora, a verificação utiliza
      * "<=" (menor ou igual), e não estritamente "<".
      *
-     * @param int|float|string|array|DateTimeInterface $value O valor limite superior exclusivo.
+     * @param int|float|string|array<array-key, mixed>|DateTimeInterface $value O valor limite superior exclusivo.
+     *
      * @return self Retorna a própria instância para permitir encadeamento de regras.
      */
     public function less(int|float|string|array|DateTimeInterface $value): self
@@ -591,54 +650,66 @@ final class Validator
      * Verifica a regra less() quando o limite é int e o valor é
      * string: compara o comprimento da string (mb_strlen) com o
      * limite (<).
+     *
+     * @return void
      */
     private function checkLessIntStr(): void
     {
-        $this->result['less'] = (mb_strlen($this->data) < $this->less);
+        if(is_string($this->data)) $this->result['less'] = (mb_strlen($this->data) < $this->less);
     }
-    
+
     /**
      * Verifica a regra less() quando o limite e o valor são
      * numéricos: compara os valores diretamente (<).
+     *
+     * @return void
      */
     private function checkLessNumeric(): void
     {
         $this->result['less'] = ($this->data < $this->less);
     }
-    
+
     /**
      * Verifica a regra less() quando o limite e o valor são
      * strings: compara o comprimento do valor (mb_strlen) com o
      * comprimento do limite (<).
+     *
+     * @return void
      */
     private function checkLessStrStr(): void
     {
-        $this->result['less'] = (mb_strlen($this->data) < mb_strlen($this->less));
+        if(is_string($this->less) && is_string($this->data)) $this->result['less'] = (mb_strlen($this->data) < mb_strlen($this->less));
     }
 
     /**
      * Verifica a regra less() quando o limite é int e o valor é
      * array: compara o número de elementos do array com o limite (<).
+     *
+     * @return void
      */
     private function checkLessIntArray(): void
     {
-        $this->result['less'] = (sizeof($this->data) < $this->less);
+        if(is_array($this->data)) $this->result['less'] = (sizeof($this->data) < $this->less);
     }
 
     /**
      * Verifica a regra less() quando o limite e o valor são arrays:
      * compara o número de elementos do valor com o número de
      * elementos do limite (<).
+     *
+     * @return void
      */
     private function checkLessArrayArray(): void
     {
-        $this->result['less'] = (sizeof($this->data) < sizeof($this->less));
+        if(is_array($this->less) && is_array($this->data)) $this->result['less'] = (sizeof($this->data) < sizeof($this->less));
     }
 
     /**
      * Verifica a regra less() quando o limite e o valor são
      * instâncias de DateTimeInterface: compara as datas/horas
      * (utilizando "<=", ou seja, inclusivo).
+     *
+     * @return void
      */
     private function checkLessDateTime(): void
     {
@@ -652,7 +723,8 @@ final class Validator
      * por valor, strings pelo comprimento (mb_strlen), arrays pelo
      * número de elementos e datas/horas entre si.
      *
-     * @param int|float|string|array|DateTimeInterface $value O valor limite inferior inclusivo.
+     * @param int|float|string|array<array-key, mixed>|DateTimeInterface $value O valor limite inferior inclusivo.
+     *
      * @return self Retorna a própria instância para permitir encadeamento de regras.
      */
     public function greatOrEqual(int|float|string|array|DateTimeInterface $value): self
@@ -665,55 +737,67 @@ final class Validator
      * Verifica a regra greatOrEqual() quando o limite é int e o
      * valor é string: compara o comprimento da string (mb_strlen)
      * com o limite (>=).
+     *
+     * @return void
      */
     private function checkGeqIntStr(): void
     {
-        $this->result['geq'] = (mb_strlen($this->data) >= $this->geq);
+        if(is_string($this->data)) $this->result['geq'] = (mb_strlen($this->data) >= $this->geq);
     }
 
     /**
      * Verifica a regra greatOrEqual() quando o limite e o valor são
      * numéricos: compara os valores diretamente (>=).
+     *
+     * @return void
      */
     private function checkGeqNumeric(): void
     {
         $this->result['geq'] = ($this->data >= $this->geq);
     }
-    
+
     /**
      * Verifica a regra greatOrEqual() quando o limite e o valor são
      * strings: compara o comprimento do valor (mb_strlen) com o
      * comprimento do limite (>=).
+     *
+     * @return void
      */
     private function checkGeqStrStr(): void
     {
-        $this->result['geq'] = (mb_strlen($this->data) >= mb_strlen($this->geq));
+        if(is_string($this->geq) && is_string($this->data)) $this->result['geq'] = (mb_strlen($this->data) >= mb_strlen($this->geq));
     }
 
     /**
      * Verifica a regra greatOrEqual() quando o limite é int e o
      * valor é array: compara o número de elementos do array com o
      * limite (>=).
+     *
+     * @return void
      */
     private function checkGeqIntArray(): void
     {
-        $this->result['geq'] = (sizeof($this->data) >= $this->geq);
+        if(is_array($this->data)) $this->result['geq'] = (sizeof($this->data) >= $this->geq);
     }
 
     /**
      * Verifica a regra greatOrEqual() quando o limite e o valor são
      * arrays: compara o número de elementos do valor com o número
      * de elementos do limite (>=).
+     *
+     * @return void
      */
     private function checkGeqArrayArray(): void
     {
-        $this->result['geq'] = (sizeof($this->data) >= sizeof($this->geq));
+        if(is_array($this->geq) && is_array($this->data)) $this->result['geq'] = (sizeof($this->data) >= sizeof($this->geq));
     }
-    
+
     /**
      * Verifica a regra greatOrEqual() quando o limite e o valor são
      * instâncias de DateTimeInterface: compara as datas/horas
      * entre si (>=).
+     *
+     * @return void
      */
     private function checkGeqDateTime(): void
     {
@@ -727,7 +811,8 @@ final class Validator
      * por valor, strings pelo comprimento (mb_strlen), arrays pelo
      * número de elementos e datas/horas entre si.
      *
-     * @param int|float|string|array|DateTimeInterface $value O valor limite inferior exclusivo.
+     * @param int|float|string|array<array-key, mixed>|DateTimeInterface $value O valor limite inferior exclusivo.
+     *
      * @return self Retorna a própria instância para permitir encadeamento de regras.
      */
     public function great(int|float|string|array|DateTimeInterface $value): self
@@ -740,54 +825,66 @@ final class Validator
      * Verifica a regra great() quando o limite é int e o valor é
      * string: compara o comprimento da string (mb_strlen) com o
      * limite (>).
+     *
+     * @return void
      */
     private function checkGreatIntStr(): void
     {
-        $this->result['great'] = (mb_strlen($this->data) > $this->great);
+        if(is_string($this->data)) $this->result['great'] = (mb_strlen($this->data) > $this->great);
     }
 
     /**
      * Verifica a regra great() quando o limite e o valor são
      * numéricos: compara os valores diretamente (>).
+     *
+     * @return void
      */
     private function checkGreatNumeric(): void
     {
         $this->result['great'] = ($this->data > $this->great);
     }
-    
+
     /**
      * Verifica a regra great() quando o limite e o valor são
      * strings: compara o comprimento do valor (mb_strlen) com o
      * comprimento do limite (>).
+     *
+     * @return void
      */
     private function checkGreatStrStr(): void
     {
-        $this->result['great'] = (mb_strlen($this->data) > mb_strlen($this->great));
+        if(is_string($this->great) && is_string($this->data)) $this->result['great'] = (mb_strlen($this->data) > mb_strlen($this->great));
     }
 
     /**
      * Verifica a regra great() quando o limite é int e o valor é
      * array: compara o número de elementos do array com o limite (>).
+     *
+     * @return void
      */
     private function checkGreatIntArray(): void
     {
-        $this->result['great'] = (sizeof($this->data) > $this->great);
+        if(is_array($this->data)) $this->result['great'] = (sizeof($this->data) > $this->great);
     }
 
     /**
      * Verifica a regra great() quando o limite e o valor são arrays:
      * compara o número de elementos do valor com o número de
      * elementos do limite (>).
+     *
+     * @return void
      */
     private function checkGreatArrayArray(): void
     {
-        $this->result['great'] = (sizeof($this->data) > sizeof($this->great));
+        if(is_array($this->great) && is_array($this->data)) $this->result['great'] = (sizeof($this->data) > sizeof($this->great));
     }
-    
+
     /**
      * Verifica a regra great() quando o limite e o valor são
      * instâncias de DateTimeInterface: compara as datas/horas
      * (utilizando ">", ou seja, exclusivo).
+     *
+     * @return void
      */
     private function checkGreatDateTime(): void
     {
@@ -804,7 +901,9 @@ final class Validator
      *
      * @param int|float|string|DateTimeInterface $down O limite inferior do intervalo (inclusivo).
      * @param int|float|string|DateTimeInterface $up   O limite superior do intervalo (inclusivo).
-     * @throws \RuntimeException Se $down e $up forem de tipos diferentes.
+     *
+     * @throws RuntimeException Se $down e $up forem de tipos diferentes.
+     *
      * @return self Retorna a própria instância para permitir encadeamento de regras.
      */
     public function between(int|float|string|DateTimeInterface $down, int|float|string|DateTimeInterface $up): self
@@ -812,7 +911,6 @@ final class Validator
         if (gettype($down) !== gettype($up)) {
             throw new \RuntimeException('Type of $down is differente of type of $up.');
         }
-
         $this->betweenDown = $down;
         $this->betweenUp = $up;
         return $this;
@@ -822,30 +920,36 @@ final class Validator
      * Verifica a regra between() quando o valor não é string:
      * compara o valor com os limites do intervalo de forma
      * inclusiva (>= $down e <= $up).
+     *
+     * @return void
      */
     private function checkBetween(): void
     {
         $this->result['between'] = (($this->data >= $this->betweenDown) && ($this->data <= $this->betweenUp));
     }
-    
+
     /**
      * Verifica a regra between() quando o valor é string e os
      * limites são numéricos: compara o comprimento da string
      * (mb_strlen) com os limites do intervalo de forma inclusiva.
+     *
+     * @return void
      */
     private function checkBetweenIntStr(): void
     {
-        $this->result['between'] = ((mb_strlen($this->data) >= $this->betweenDown) && (mb_strlen($this->data) <= $this->betweenUp));
+        if(is_string($this->data)) $this->result['between'] = ((mb_strlen($this->data) >= $this->betweenDown) && (mb_strlen($this->data) <= $this->betweenUp));
     }
-    
+
     /**
      * Verifica a regra between() quando o valor e os limites são
      * strings: compara o comprimento do valor (mb_strlen) com o
      * comprimento dos limites do intervalo de forma inclusiva.
+     *
+     * @return void
      */
     private function checkBetweenStrStr(): void
     {
-        $this->result['between'] = ((mb_strlen($this->data) >= mb_strlen($this->betweenDown)) && (mb_strlen($this->data) <= mb_strlen($this->betweenUp)));
+        if(is_string($this->betweenDown) && is_string($this->betweenUp) && is_string($this->data)) $this->result['between'] = ((mb_strlen($this->data) >= mb_strlen($this->betweenDown)) && (mb_strlen($this->data) <= mb_strlen($this->betweenUp)));
     }
 
     /**
@@ -858,7 +962,8 @@ final class Validator
      * comparação estrita (portanto '1' e 1 são considerados
      * equivalentes).
      *
-     * @param string|array $contains A substring exigida ou a lista de valores aceitos.
+     * @param string|array<array-key, mixed> $contains A substring exigida ou a lista de valores aceitos.
+     *
      * @return self Retorna a própria instância para permitir encadeamento de regras.
      */
     public function contains(string|array $contains): self
@@ -872,21 +977,25 @@ final class Validator
      * verifica se o valor (ou lista) configurado está presente no
      * array validado, usando in_array() sem comparação estrita.
      * O resultado é registrado em result() sob a chave 'contains'.
+     *
+     * @return void
      */
     private function checkContainsArray(): void
     {
-        $this->result['contains'] = in_array($this->contains, $this->data);
+        if(is_array($this->data)) $this->result['contains'] = in_array($this->contains, $this->data);
     }
-    
+
     /**
      * Verifica a regra contains() quando o valor é uma string:
      * verifica se o valor contém a substring configurada
      * (str_contains()). O resultado é registrado em result() sob a
      * chave 'contains'.
+     *
+     * @return void
      */
     private function checkContainsStr(): void
     {
-        $this->result['contains'] = str_contains($this->data, $this->contains);
+        if(is_string($this->contains) && is_string($this->data)) $this->result['contains'] = str_contains($this->data, $this->contains);
     }
 
     /**
@@ -898,6 +1007,7 @@ final class Validator
      * null em result()) e não representa uma validação negativa.
      *
      * @param bool $file Se true (padrão), valida se o caminho é um arquivo existente.
+     *
      * @return self Retorna a própria instância para permitir encadeamento de regras.
      */
     public function file(bool $file = true): self
@@ -910,10 +1020,12 @@ final class Validator
      * Verifica a regra file: valida se o valor (um caminho) é um
      * arquivo existente, usando is_file(). O resultado é registrado
      * em result() sob a chave 'file'.
+     *
+     * @return void
      */
     private function checkFile(): void
     {
-        $this->result['file'] = is_file($this->data);
+        if(is_string($this->data)) $this->result['file'] = is_file($this->data);
     }
 
     /**
@@ -925,6 +1037,7 @@ final class Validator
      * null em result()) e não representa uma validação negativa.
      *
      * @param bool $directory Se true (padrão), valida se o caminho é um diretório existente.
+     *
      * @return self Retorna a própria instância para permitir encadeamento de regras.
      */
     public function directory(bool $directory = true): self
@@ -937,10 +1050,12 @@ final class Validator
      * Verifica a regra directory: valida se o valor (um caminho) é
      * um diretório existente, usando is_dir(). O resultado é
      * registrado em result() sob a chave 'directory'.
+     *
+     * @return void
      */
     private function checkDirectory(): void
     {
-        $this->result['directory'] = is_dir($this->data);
+        if(is_string($this->data)) $this->result['directory'] = is_dir($this->data);
     }
 
     /**
@@ -952,6 +1067,7 @@ final class Validator
      * null em result()) e não representa uma validação negativa.
      *
      * @param bool $exists Se true (padrão), valida se o caminho existe.
+     *
      * @return self Retorna a própria instância para permitir encadeamento de regras.
      */
     public function exists(bool $exists = true): self
@@ -964,10 +1080,12 @@ final class Validator
      * Verifica a regra exists: valida se o valor (um caminho)
      * existe no sistema de arquivos, usando file_exists(). O
      * resultado é registrado em result() sob a chave 'exists'.
+     *
+     * @return void
      */
     private function checkExists(): void
     {
-        $this->result['exists'] = file_exists($this->data);
+        if(is_string($this->data)) $this->result['exists'] = file_exists($this->data);
     }
 
     /**
@@ -978,6 +1096,7 @@ final class Validator
      * string.
      *
      * @param string $substr A substring com a qual o valor deve começar.
+     *
      * @return self Retorna a própria instância para permitir encadeamento de regras.
      */
     public function startswith(string $substr): self
@@ -991,12 +1110,14 @@ final class Validator
      * começa com a substring informada, usando
      * str_starts_with(). O resultado é registrado em result()
      * sob a chave 'startswith'.
+     *
+     * @return void
      */
     private function checkStartsWith(): void
     {
-        $this->result['startswith'] = str_starts_with($this->data, $this->startswith);
+        if(is_string($this->startswith) && is_string($this->data)) $this->result['startswith'] = str_starts_with($this->data, $this->startswith);
     }
-    
+
     /**
      * Define que o valor (uma string) deve terminar com a substring
      * informada.
@@ -1005,6 +1126,7 @@ final class Validator
      * string.
      *
      * @param string $substr A substring com a qual o valor deve terminar.
+     *
      * @return self Retorna a própria instância para permitir encadeamento de regras.
      */
     public function endswith(string $substr): self
@@ -1018,9 +1140,11 @@ final class Validator
      * termina com a substring informada, usando
      * str_ends_with(). O resultado é registrado em result()
      * sob a chave 'endswith'.
+     *
+     * @return void
      */
     private function checkEndsWith(): void
     {
-        $this->result['endswith'] = str_ends_with($this->data, $this->endswith);
+        if(is_string($this->endswith) && is_string($this->data)) $this->result['endswith'] = str_ends_with($this->data, $this->endswith);
     }
 }
