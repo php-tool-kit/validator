@@ -958,7 +958,9 @@ final class Validator
         }
 
         // se string
+        if(is_string($this->data)){
             $this->result['contains'] = str_contains($this->data, $this->contains);
+        }
     }
 
     /**
