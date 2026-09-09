@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dashboard for C:\projects\validator\src</title>
+  <link rel="stylesheet" href="_css/style.css?v=14.3.2">
+  <link rel="stylesheet" href="_css/custom.css">
+ </head>
+ <body>
+  <header class="masthead">
+   <nav aria-label="Breadcrumb">
+    <ol class="breadcrumbs">
+     <li><a href="index.html">C:\projects\validator\src</a></li>
+     <li class="current">Dashboard</li>
+    </ol>
+   </nav>
+   <ul class="tabs">
+    <li><a href="index.html" aria-current="page">Files</a></li>
+    <li><a href="_classes/dashboard.html">Classes</a></li>
+   </ul>
+  </header>
+  <main class="dashboard">
+   <section>
+    <h2>Classes</h2>
+    <div class="panel">
+     <div class="chart">
+      <p class="hint">Line coverage against cyclomatic complexity. Bubble size is the number of executable lines; hover for details, click to navigate.</p>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" preserveAspectRatio="xMidYMid meet">
+ <style>
+  .bubble-success { fill: var(--coverage-success-bar); opacity: 0.7; }
+  .bubble-warning { fill: var(--coverage-warning-bar); opacity: 0.7; }
+  .bubble-danger { fill: var(--coverage-danger-bar); opacity: 0.7; }
+  .bubble-success:hover, .bubble-warning:hover, .bubble-danger:hover { opacity: 1; stroke: var(--text); stroke-width: 1.5; }
+  .chart-grid { stroke: var(--border); stroke-width: 0.5; stroke-dasharray: 4,4; opacity: 0.5; }
+  .chart-axis { stroke: var(--border); stroke-width: 1; }
+  .chart-label { fill: var(--text); font-size: 11px; font-family: var(--font-sans); }
+  .chart-title { fill: var(--text); font-size: 12px; font-family: var(--font-sans); }
+ </style>
+ <line x1="60.0" y1="20" x2="60.0" y2="350" class="chart-grid"/>
+ <text x="60.0" y="368" text-anchor="middle" class="chart-label">0%</text>
+ <line x1="204.0" y1="20" x2="204.0" y2="350" class="chart-grid"/>
+ <text x="204.0" y="368" text-anchor="middle" class="chart-label">20%</text>
+ <line x1="348.0" y1="20" x2="348.0" y2="350" class="chart-grid"/>
+ <text x="348.0" y="368" text-anchor="middle" class="chart-label">40%</text>
+ <line x1="492.0" y1="20" x2="492.0" y2="350" class="chart-grid"/>
+ <text x="492.0" y="368" text-anchor="middle" class="chart-label">60%</text>
+ <line x1="636.0" y1="20" x2="636.0" y2="350" class="chart-grid"/>
+ <text x="636.0" y="368" text-anchor="middle" class="chart-label">80%</text>
+ <line x1="780.0" y1="20" x2="780.0" y2="350" class="chart-grid"/>
+ <text x="780.0" y="368" text-anchor="middle" class="chart-label">100%</text>
+ <line x1="60" y1="350.0" x2="780" y2="350.0" class="chart-grid"/>
+ <text x="52" y="350.0" text-anchor="end" dominant-baseline="middle" class="chart-label">0</text>
+ <line x1="60" y1="284.0" x2="780" y2="284.0" class="chart-grid"/>
+ <text x="52" y="284.0" text-anchor="end" dominant-baseline="middle" class="chart-label">20</text>
+ <line x1="60" y1="218.0" x2="780" y2="218.0" class="chart-grid"/>
+ <text x="52" y="218.0" text-anchor="end" dominant-baseline="middle" class="chart-label">40</text>
+ <line x1="60" y1="152.0" x2="780" y2="152.0" class="chart-grid"/>
+ <text x="52" y="152.0" text-anchor="end" dominant-baseline="middle" class="chart-label">60</text>
+ <line x1="60" y1="86.0" x2="780" y2="86.0" class="chart-grid"/>
+ <text x="52" y="86.0" text-anchor="end" dominant-baseline="middle" class="chart-label">80</text>
+ <line x1="60" y1="20.0" x2="780" y2="20.0" class="chart-grid"/>
+ <text x="52" y="20.0" text-anchor="end" dominant-baseline="middle" class="chart-label">100</text>
+ <line x1="60" y1="20" x2="60" y2="350" class="chart-axis"/>
+ <line x1="60" y1="350" x2="780" y2="350" class="chart-axis"/>
+ <text x="420.0" y="395" text-anchor="middle" class="chart-title">Line Coverage (%)</text>
+ <text x="15" y="185.0" text-anchor="middle" transform="rotate(-90, 15, 185.0)" class="chart-title">Cyclomatic Complexity</text>
+ <a href="Validator.php.html#30"><circle cx="780.0" cy="59.6" r="20.0" class="bubble-success"><title>Ptk\Validator\Validator — Coverage: 100.0% | Lines: 193 | Complexity: 88</title></circle></a>
+</svg>
+     </div>
+     <div>
+      <p class="hint">Sorted by descending <abbr title="Change Risk Anti-Patterns">CRAP</abbr> index.</p>
+      <div class="scrollbox">
+     <table class="crap">
+      <thead>
+       <tr>
+        <th scope="col">Class</th>
+        <th scope="col" class="number"><abbr title="Change Risk Anti-Patterns (CRAP) Index">CRAP</abbr></th>
+        <th scope="col" class="number">Coverage</th>
+       </tr>
+      </thead>
+      <tbody>
+       <tr><td><a href="Validator.php.html#30">Ptk\Validator\Validator</a></td><td class="number">88</td><td class="number">100.0%</td></tr>
+       <tr><td><a href="Types.php.html#18">Ptk\Validator\Types</a></td><td class="number">0</td><td class="number">100.0%</td></tr>
+      </tbody>
+     </table>
+      </div>
+     </div>
+    </div>
+   </section>
+   <section>
+    <h2>Methods</h2>
+    <div class="panel">
+     <div class="chart">
+      <p class="hint">Line coverage against cyclomatic complexity. Bubble size is the number of executable lines; hover for details, click to navigate.</p>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" preserveAspectRatio="xMidYMid meet">
+ <style>
+  .bubble-success { fill: var(--coverage-success-bar); opacity: 0.7; }
+  .bubble-warning { fill: var(--coverage-warning-bar); opacity: 0.7; }
+  .bubble-danger { fill: var(--coverage-danger-bar); opacity: 0.7; }
+  .bubble-success:hover, .bubble-warning:hover, .bubble-danger:hover { opacity: 1; stroke: var(--text); stroke-width: 1.5; }
+  .chart-grid { stroke: var(--border); stroke-width: 0.5; stroke-dasharray: 4,4; opacity: 0.5; }
+  .chart-axis { stroke: var(--border); stroke-width: 1; }
+  .chart-label { fill: var(--text); font-size: 11px; font-family: var(--font-sans); }
+  .chart-title { fill: var(--text); font-size: 12px; font-family: var(--font-sans); }
+ </style>
+ <line x1="60.0" y1="20" x2="60.0" y2="350" class="chart-grid"/>
+ <text x="60.0" y="368" text-anchor="middle" class="chart-label">0%</text>
+ <line x1="204.0" y1="20" x2="204.0" y2="350" class="chart-grid"/>
+ <text x="204.0" y="368" text-anchor="middle" class="chart-label">20%</text>
+ <line x1="348.0" y1="20" x2="348.0" y2="350" class="chart-grid"/>
+ <text x="348.0" y="368" text-anchor="middle" class="chart-label">40%</text>
+ <line x1="492.0" y1="20" x2="492.0" y2="350" class="chart-grid"/>
+ <text x="492.0" y="368" text-anchor="middle" class="chart-label">60%</text>
+ <line x1="636.0" y1="20" x2="636.0" y2="350" class="chart-grid"/>
+ <text x="636.0" y="368" text-anchor="middle" class="chart-label">80%</text>
+ <line x1="780.0" y1="20" x2="780.0" y2="350" class="chart-grid"/>
+ <text x="780.0" y="368" text-anchor="middle" class="chart-label">100%</text>
+ <line x1="60" y1="350.0" x2="780" y2="350.0" class="chart-grid"/>
+ <text x="52" y="350.0" text-anchor="end" dominant-baseline="middle" class="chart-label">0</text>
+ <line x1="60" y1="240.0" x2="780" y2="240.0" class="chart-grid"/>
+ <text x="52" y="240.0" text-anchor="end" dominant-baseline="middle" class="chart-label">5</text>
+ <line x1="60" y1="130.0" x2="780" y2="130.0" class="chart-grid"/>
+ <text x="52" y="130.0" text-anchor="end" dominant-baseline="middle" class="chart-label">10</text>
+ <line x1="60" y1="20.0" x2="780" y2="20.0" class="chart-grid"/>
+ <text x="52" y="20.0" text-anchor="end" dominant-baseline="middle" class="chart-label">15</text>
+ <line x1="60" y1="20" x2="60" y2="350" class="chart-axis"/>
+ <line x1="60" y1="350" x2="780" y2="350" class="chart-axis"/>
+ <text x="420.0" y="395" text-anchor="middle" class="chart-title">Line Coverage (%)</text>
+ <text x="15" y="185.0" text-anchor="middle" transform="rotate(-90, 15, 185.0)" class="chart-title">Cyclomatic Complexity</text>
+ <a href="Validator.php.html#524"><circle cx="780.0" cy="64.0" r="20.0" class="bubble-success"><title>Ptk\Validator\Validator::checkType — Coverage: 100.0% | Lines: 35 | Complexity: 13</title></circle></a>
+ <a href="Validator.php.html#404"><circle cx="780.0" cy="196.0" r="14.3" class="bubble-success"><title>Ptk\Validator\Validator::checkEmpty — Coverage: 100.0% | Lines: 18 | Complexity: 7</title></circle></a>
+ <a href="Validator.php.html#234"><circle cx="780.0" cy="328.0" r="13.5" class="bubble-success"><title>Ptk\Validator\Validator::validate — Coverage: 100.0% | Lines: 16 | Complexity: 1</title></circle></a>
+ <a href="Validator.php.html#650"><circle cx="780.0" cy="240.0" r="12.2" class="bubble-success"><title>Ptk\Validator\Validator::checkMin — Coverage: 100.0% | Lines: 13 | Complexity: 5</title></circle></a>
+ <a href="Validator.php.html#711"><circle cx="780.0" cy="240.0" r="12.2" class="bubble-success"><title>Ptk\Validator\Validator::checkMax — Coverage: 100.0% | Lines: 13 | Complexity: 5</title></circle></a>
+ <a href="Validator.php.html#781"><circle cx="780.0" cy="108.0" r="12.2" class="bubble-success"><title>Ptk\Validator\Validator::checkBetween — Coverage: 100.0% | Lines: 13 | Complexity: 11</title></circle></a>
+ <a href="Validator.php.html#345"><circle cx="780.0" cy="240.0" r="11.2" class="bubble-success"><title>Ptk\Validator\Validator::checkRequired — Coverage: 100.0% | Lines: 11 | Complexity: 5</title></circle></a>
+ <a href="Validator.php.html#471"><circle cx="780.0" cy="262.0" r="9.6" class="bubble-success"><title>Ptk\Validator\Validator::checkNullable — Coverage: 100.0% | Lines: 8 | Complexity: 4</title></circle></a>
+ <a href="Validator.php.html#840"><circle cx="780.0" cy="284.0" r="8.9" class="bubble-success"><title>Ptk\Validator\Validator::checkContains — Coverage: 100.0% | Lines: 7 | Complexity: 3</title></circle></a>
+ <a href="Validator.php.html#756"><circle cx="780.0" cy="306.0" r="7.6" class="bubble-success"><title>Ptk\Validator\Validator::between — Coverage: 100.0% | Lines: 5 | Complexity: 2</title></circle></a>
+ <a href="Validator.php.html#605"><circle cx="780.0" cy="306.0" r="6.8" class="bubble-success"><title>Ptk\Validator\Validator::checkIs — Coverage: 100.0% | Lines: 4 | Complexity: 2</title></circle></a>
+ <a href="Validator.php.html#891"><circle cx="780.0" cy="284.0" r="6.8" class="bubble-success"><title>Ptk\Validator\Validator::checkFile — Coverage: 100.0% | Lines: 4 | Complexity: 3</title></circle></a>
+ <a href="Validator.php.html#933"><circle cx="780.0" cy="284.0" r="6.8" class="bubble-success"><title>Ptk\Validator\Validator::checkDirectory — Coverage: 100.0% | Lines: 4 | Complexity: 3</title></circle></a>
+ <a href="Validator.php.html#975"><circle cx="780.0" cy="284.0" r="6.8" class="bubble-success"><title>Ptk\Validator\Validator::checkExists — Coverage: 100.0% | Lines: 4 | Complexity: 3</title></circle></a>
+ <a href="Validator.php.html#1013"><circle cx="780.0" cy="306.0" r="6.8" class="bubble-success"><title>Ptk\Validator\Validator::checkStartsWith — Coverage: 100.0% | Lines: 4 | Complexity: 2</title></circle></a>
+ <a href="Validator.php.html#1048"><circle cx="780.0" cy="306.0" r="6.8" class="bubble-success"><title>Ptk\Validator\Validator::checkEndsWith — Coverage: 100.0% | Lines: 4 | Complexity: 2</title></circle></a>
+ <a href="Validator.php.html#327"><circle cx="780.0" cy="328.0" r="4.8" class="bubble-success"><title>Ptk\Validator\Validator::required — Coverage: 100.0% | Lines: 2 | Complexity: 1</title></circle></a>
+ <a href="Validator.php.html#386"><circle cx="780.0" cy="328.0" r="4.8" class="bubble-success"><title>Ptk\Validator\Validator::empty — Coverage: 100.0% | Lines: 2 | Complexity: 1</title></circle></a>
+ <a href="Validator.php.html#454"><circle cx="780.0" cy="328.0" r="4.8" class="bubble-success"><title>Ptk\Validator\Validator::nullable — Coverage: 100.0% | Lines: 2 | Complexity: 1</title></circle></a>
+ <a href="Validator.php.html#504"><circle cx="780.0" cy="328.0" r="4.8" class="bubble-success"><title>Ptk\Validator\Validator::type — Coverage: 100.0% | Lines: 2 | Complexity: 1</title></circle></a>
+ <a href="Validator.php.html#587"><circle cx="780.0" cy="328.0" r="4.8" class="bubble-success"><title>Ptk\Validator\Validator::is — Coverage: 100.0% | Lines: 2 | Complexity: 1</title></circle></a>
+ <a href="Validator.php.html#631"><circle cx="780.0" cy="328.0" r="4.8" class="bubble-success"><title>Ptk\Validator\Validator::min — Coverage: 100.0% | Lines: 2 | Complexity: 1</title></circle></a>
+ <a href="Validator.php.html#692"><circle cx="780.0" cy="328.0" r="4.8" class="bubble-success"><title>Ptk\Validator\Validator::max — Coverage: 100.0% | Lines: 2 | Complexity: 1</title></circle></a>
+ <a href="Validator.php.html#824"><circle cx="780.0" cy="328.0" r="4.8" class="bubble-success"><title>Ptk\Validator\Validator::contains — Coverage: 100.0% | Lines: 2 | Complexity: 1</title></circle></a>
+ <a href="Validator.php.html#873"><circle cx="780.0" cy="328.0" r="4.8" class="bubble-success"><title>Ptk\Validator\Validator::file — Coverage: 100.0% | Lines: 2 | Complexity: 1</title></circle></a>
+ <a href="Validator.php.html#915"><circle cx="780.0" cy="328.0" r="4.8" class="bubble-success"><title>Ptk\Validator\Validator::directory — Coverage: 100.0% | Lines: 2 | Complexity: 1</title></circle></a>
+ <a href="Validator.php.html#957"><circle cx="780.0" cy="328.0" r="4.8" class="bubble-success"><title>Ptk\Validator\Validator::exists — Coverage: 100.0% | Lines: 2 | Complexity: 1</title></circle></a>
+ <a href="Validator.php.html#995"><circle cx="780.0" cy="328.0" r="4.8" class="bubble-success"><title>Ptk\Validator\Validator::startswith — Coverage: 100.0% | Lines: 2 | Complexity: 1</title></circle></a>
+ <a href="Validator.php.html#1032"><circle cx="780.0" cy="328.0" r="4.8" class="bubble-success"><title>Ptk\Validator\Validator::endswith — Coverage: 100.0% | Lines: 2 | Complexity: 1</title></circle></a>
+ <a href="Validator.php.html#215"><circle cx="780.0" cy="328.0" r="4.0" class="bubble-success"><title>Ptk\Validator\Validator::__construct — Coverage: 100.0% | Lines: 1 | Complexity: 1</title></circle></a>
+ <a href="Validator.php.html#268"><circle cx="780.0" cy="328.0" r="4.0" class="bubble-success"><title>Ptk\Validator\Validator::result — Coverage: 100.0% | Lines: 1 | Complexity: 1</title></circle></a>
+ <a href="Validator.php.html#284"><circle cx="780.0" cy="328.0" r="4.0" class="bubble-success"><title>Ptk\Validator\Validator::passed — Coverage: 100.0% | Lines: 1 | Complexity: 1</title></circle></a>
+ <a href="Validator.php.html#307"><circle cx="780.0" cy="328.0" r="4.0" class="bubble-success"><title>Ptk\Validator\Validator::failed — Coverage: 100.0% | Lines: 1 | Complexity: 1</title></circle></a>
+</svg>
+     </div>
+     <div>
+      <p class="hint">Sorted by descending <abbr title="Change Risk Anti-Patterns">CRAP</abbr> index.</p>
+      <div class="scrollbox">
+     <table class="crap">
+      <thead>
+       <tr>
+        <th scope="col">Method</th>
+        <th scope="col" class="number"><abbr title="Change Risk Anti-Patterns (CRAP) Index">CRAP</abbr></th>
+        <th scope="col" class="number">Coverage</th>
+       </tr>
+      </thead>
+      <tbody>
+       <tr><td><a href="Validator.php.html#524">Ptk\Validator\Validator::checkType</a></td><td class="number">13</td><td class="number">100.0%</td></tr>
+       <tr><td><a href="Validator.php.html#781">Ptk\Validator\Validator::checkBetween</a></td><td class="number">11</td><td class="number">100.0%</td></tr>
+       <tr><td><a href="Validator.php.html#404">Ptk\Validator\Validator::checkEmpty</a></td><td class="number">7</td><td class="number">100.0%</td></tr>
+       <tr><td><a href="Validator.php.html#345">Ptk\Validator\Validator::checkRequired</a></td><td class="number">5</td><td class="number">100.0%</td></tr>
+       <tr><td><a href="Validator.php.html#650">Ptk\Validator\Validator::checkMin</a></td><td class="number">5</td><td class="number">100.0%</td></tr>
+       <tr><td><a href="Validator.php.html#711">Ptk\Validator\Validator::checkMax</a></td><td class="number">5</td><td class="number">100.0%</td></tr>
+       <tr><td><a href="Validator.php.html#471">Ptk\Validator\Validator::checkNullable</a></td><td class="number">4</td><td class="number">100.0%</td></tr>
+       <tr><td><a href="Validator.php.html#840">Ptk\Validator\Validator::checkContains</a></td><td class="number">3</td><td class="number">100.0%</td></tr>
+       <tr><td><a href="Validator.php.html#891">Ptk\Validator\Validator::checkFile</a></td><td class="number">3</td><td class="number">100.0%</td></tr>
+       <tr><td><a href="Validator.php.html#933">Ptk\Validator\Validator::checkDirectory</a></td><td class="number">3</td><td class="number">100.0%</td></tr>
+       <tr><td><a href="Validator.php.html#975">Ptk\Validator\Validator::checkExists</a></td><td class="number">3</td><td class="number">100.0%</td></tr>
+       <tr><td><a href="Validator.php.html#605">Ptk\Validator\Validator::checkIs</a></td><td class="number">2</td><td class="number">100.0%</td></tr>
+       <tr><td><a href="Validator.php.html#756">Ptk\Validator\Validator::between</a></td><td class="number">2</td><td class="number">100.0%</td></tr>
+       <tr><td><a href="Validator.php.html#1013">Ptk\Validator\Validator::checkStartsWith</a></td><td class="number">2</td><td class="number">100.0%</td></tr>
+       <tr><td><a href="Validator.php.html#1048">Ptk\Validator\Validator::checkEndsWith</a></td><td class="number">2</td><td class="number">100.0%</td></tr>
+       <tr><td><a href="Validator.php.html#215">Ptk\Validator\Validator::__construct</a></td><td class="number">1</td><td class="number">100.0%</td></tr>
+       <tr><td><a href="Validator.php.html#234">Ptk\Validator\Validator::validate</a></td><td class="number">1</td><td class="number">100.0%</td></tr>
+       <tr><td><a href="Validator.php.html#268">Ptk\Validator\Validator::result</a></td><td class="number">1</td><td class="number">100.0%</td></tr>
+       <tr><td><a href="Validator.php.html#284">Ptk\Validator\Validator::passed</a></td><td class="number">1</td><td class="number">100.0%</td></tr>
+       <tr><td><a href="Validator.php.html#307">Ptk\Validator\Validator::failed</a></td><td class="number">1</td><td class="number">100.0%</td></tr>
+       <tr><td><a href="Validator.php.html#327">Ptk\Validator\Validator::required</a></td><td class="number">1</td><td class="number">100.0%</td></tr>
+       <tr><td><a href="Validator.php.html#386">Ptk\Validator\Validator::empty</a></td><td class="number">1</td><td class="number">100.0%</td></tr>
+       <tr><td><a href="Validator.php.html#454">Ptk\Validator\Validator::nullable</a></td><td class="number">1</td><td class="number">100.0%</td></tr>
+       <tr><td><a href="Validator.php.html#504">Ptk\Validator\Validator::type</a></td><td class="number">1</td><td class="number">100.0%</td></tr>
+       <tr><td><a href="Validator.php.html#587">Ptk\Validator\Validator::is</a></td><td class="number">1</td><td class="number">100.0%</td></tr>
+       <tr><td><a href="Validator.php.html#631">Ptk\Validator\Validator::min</a></td><td class="number">1</td><td class="number">100.0%</td></tr>
+       <tr><td><a href="Validator.php.html#692">Ptk\Validator\Validator::max</a></td><td class="number">1</td><td class="number">100.0%</td></tr>
+       <tr><td><a href="Validator.php.html#824">Ptk\Validator\Validator::contains</a></td><td class="number">1</td><td class="number">100.0%</td></tr>
+       <tr><td><a href="Validator.php.html#873">Ptk\Validator\Validator::file</a></td><td class="number">1</td><td class="number">100.0%</td></tr>
+       <tr><td><a href="Validator.php.html#915">Ptk\Validator\Validator::directory</a></td><td class="number">1</td><td class="number">100.0%</td></tr>
+       <tr><td><a href="Validator.php.html#957">Ptk\Validator\Validator::exists</a></td><td class="number">1</td><td class="number">100.0%</td></tr>
+       <tr><td><a href="Validator.php.html#995">Ptk\Validator\Validator::startswith</a></td><td class="number">1</td><td class="number">100.0%</td></tr>
+       <tr><td><a href="Validator.php.html#1032">Ptk\Validator\Validator::endswith</a></td><td class="number">1</td><td class="number">100.0%</td></tr>
+      </tbody>
+     </table>
+      </div>
+     </div>
+    </div>
+   </section>
+  </main>
+  <footer>
+   <p class="credits">Generated by <a href="https://github.com/sebastianbergmann/php-code-coverage" target="_top">php-code-coverage 14.3.2</a> using <a href="https://www.php.net/" target="_top">PHP 8.5.7</a> and <a href="https://phpunit.de/">PHPUnit 13.3.2</a> at Wed Sep 9 11:31:37 UTC 2026.</p>
+  </footer>
+ </body>
+</html>

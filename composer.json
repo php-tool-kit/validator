@@ -30,7 +30,8 @@
         "docs": "https://github.com/everton3x/csrf/README.md"
     },
     "require": {
-        "php": ">=8.5.7"
+        "php": ">=8.5.7",
+        "ext-mbstring": "*"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,

@@ -565,10 +565,12 @@ final class Validator
             case Types::CALLABLE:
                 $this->result['type'] = is_callable($this->data);
                 return;
+            // @codeCoverageIgnoreStart
             default:
                 // Se não for nenhum dos tipos...
                 $this->result['type'] = false;
                 return;
+            // @codeCoverageIgnoreEnd
         }
     }
 
@@ -661,7 +663,11 @@ final class Validator
 
         // Se for string
         if (is_string($this->data)) {
-            $this->result['min'] = !(mb_strlen($this->data) < $this->min);
+            if(is_string($this->min)){
+                $this->result['min'] = !(mb_strlen($this->data) < mb_strlen($this->min));
+            }else{
+                $this->result['min'] = !(mb_strlen($this->data) < $this->min);
+            }
             return;
         }
 
@@ -718,7 +724,11 @@ final class Validator
 
         // Se for string
         if (is_string($this->data)) {
-            $this->result['max'] = !(mb_strlen($this->data) > $this->max);
+            if(is_string($this->max)){
+                $this->result['max'] = !(mb_strlen($this->data) > mb_strlen($this->max));
+            }else{
+                $this->result['max'] = !(mb_strlen($this->data) > $this->max);
+            }
             return;
         }
 
@@ -784,7 +794,11 @@ final class Validator
 
         // Se for string
         if (is_string($this->data)) {
-            $this->result['between'] = !((mb_strlen($this->data) < $this->betweenDown) || (mb_strlen($this->data) > $this->betweenUp));
+            if(is_string($this->betweenDown) && is_string($this->betweenUp)){
+                $this->result['between'] = !((mb_strlen($this->data) < mb_strlen($this->betweenDown)) || (mb_strlen($this->data) > mb_strlen($this->betweenUp)));
+            }else{
+                $this->result['between'] = !((mb_strlen($this->data) < $this->betweenDown) || (mb_strlen($this->data) > $this->betweenUp));
+            }
             return;
         }
 
@@ -856,7 +870,7 @@ final class Validator
      *        existente.
      * @return self Instância atual, para encadeamento de métodos.
      */
-    public function file(bool $file): self
+    public function file(bool $file = true): self
     {
         $this->file = $file;
         return $this;
@@ -898,7 +912,7 @@ final class Validator
      *        existente.
      * @return self Instância atual, para encadeamento de métodos.
      */
-    public function directory(bool $directory): self
+    public function directory(bool $directory = true): self
     {
         $this->directory = $directory;
         return $this;
@@ -940,7 +954,7 @@ final class Validator
      *        informado.
      * @return self Instância atual, para encadeamento de métodos.
      */
-    public function exists(bool $exists): self
+    public function exists(bool $exists = true): self
     {
         $this->exists = $exists;
         return $this;
