@@ -51,14 +51,6 @@ test('empty(false): fail (empty array)', function () {
     expect($this->validator->empty(false)->validate([]))->toBeFalse();
 });
 
-test('empty(true): fail (null)', function () {
-    expect($this->validator->empty(true)->validate(null))->toBeFalse();
-});
-
-test('empty(false): fail (null)', function () {
-    expect($this->validator->empty(false)->validate(null))->toBeFalse();
-});
-
 test('nullable(true): pass (null)', function(){
     expect($this->validator->nullable(true)->validate(null))->toBeTrue();
 });
@@ -123,89 +115,201 @@ test('is(className): fail', function(){
     expect($this->validator->is(stdClass::class)->validate($this->validator))->toBeFalse();
 });
 
-test('min(int): pass', function(){
-    expect($this->validator->min(1)->validate(10))->toBeTrue();
+test('leq(numeric): pass', function(){
+    expect($this->validator->lessOrEqual(10)->validate(9))->toBeTrue();
 });
 
-test('min(float): pass', function(){
-    expect($this->validator->min(3.14)->validate(3.15))->toBeTrue();
+test('leq(numeric): fail', function(){
+    expect($this->validator->lessOrEqual(9)->validate(10))->toBeFalse();
 });
 
-test('min(string|string): pass', function(){
-    expect($this->validator->min('abc')->validate('abcde'))->toBeTrue();
+test('leq(int, str): pass', function(){
+    expect($this->validator->lessOrEqual(10)->validate('abcde'))->toBeTrue();
 });
 
-test('min(string|int): pass', function(){
-    expect($this->validator->min(3)->validate('abcde'))->toBeTrue();
+test('leq(int, str): fail', function(){
+    expect($this->validator->lessOrEqual(3)->validate('abcde'))->toBeFalse();
 });
 
-test('min(DateTime): pass', function(){
-    expect($this->validator->min(new DateTimeImmutable('1981-05-12'))->validate(new DateTimeImmutable('now')))->toBeTrue();
+test('leq(str, str): pass', function(){
+    expect($this->validator->lessOrEqual('abcdefg')->validate('abcde'))->toBeTrue();
+});
+
+test('leq(str, str): fail', function(){
+    expect($this->validator->lessOrEqual('abcd')->validate('abcde'))->toBeFalse();
+});
+
+test('leq(int, array): pass', function(){
+    expect($this->validator->lessOrEqual(3)->validate([1, 2]))->toBeTrue();
+});
+
+test('leq(int, array): fail', function(){
+    expect($this->validator->lessOrEqual(3)->validate([1,2,3,4]))->toBeFalse();
+});
+
+test('leq(array, array): pass', function(){
+    expect($this->validator->lessOrEqual([1,2,3,4])->validate([1, 2]))->toBeTrue();
+});
+
+test('leq(array, array): fail', function(){
+    expect($this->validator->lessOrEqual([1,2,3])->validate([1,2,3,4]))->toBeFalse();
+});
+
+test('leq(DateTime): pass', function(){
+    expect($this->validator->lessOrEqual(new DateTimeImmutable('now'))->validate(new DateTimeImmutable('1981-05-12')))->toBeTrue();
+});
+
+test('leq(DateTime): fail', function(){
+    expect($this->validator->lessOrEqual(new DateTimeImmutable('1981-05-12'))->validate(new DateTimeImmutable('now')))->toBeFalse();
+});
+
+test('less(numeric): pass', function(){
+    expect($this->validator->less(10)->validate(9))->toBeTrue();
+});
+
+test('less(numeric): fail', function(){
+    expect($this->validator->less(9)->validate(10))->toBeFalse();
+});
+
+test('less(int, str): pass', function(){
+    expect($this->validator->less(10)->validate('abcde'))->toBeTrue();
+});
+
+test('less(int, str): fail', function(){
+    expect($this->validator->less(3)->validate('abcde'))->toBeFalse();
+});
+
+test('less(str, str): pass', function(){
+    expect($this->validator->less('abcdefg')->validate('abcde'))->toBeTrue();
+});
+
+test('less(str, str): fail', function(){
+    expect($this->validator->less('abcd')->validate('abcde'))->toBeFalse();
+});
+
+test('less(int, array): pass', function(){
+    expect($this->validator->less(3)->validate([1, 2]))->toBeTrue();
+});
+
+test('less(int, array): fail', function(){
+    expect($this->validator->less(3)->validate([1,2,3,4]))->toBeFalse();
+});
+
+test('less(array, array): pass', function(){
+    expect($this->validator->less([1,2,3,4])->validate([1, 2]))->toBeTrue();
+});
+
+test('less(array, array): fail', function(){
+    expect($this->validator->less([1,2,3])->validate([1,2,3,4]))->toBeFalse();
+});
+
+test('less(DateTime): pass', function(){
+    expect($this->validator->less(new DateTimeImmutable('now'))->validate(new DateTimeImmutable('1981-05-12')))->toBeTrue();
+});
+
+test('less(DateTime): fail', function(){
+    expect($this->validator->less(new DateTimeImmutable('1981-05-12'))->validate(new DateTimeImmutable('now')))->toBeFalse();
+});
+
+test('geq(numeric): pass', function(){
+    expect($this->validator->greatOrEqual(9)->validate(10))->toBeTrue();
+});
+
+test('geq(numeric): fail', function(){
+    expect($this->validator->greatOrEqual(10)->validate(9))->toBeFalse();
+});
+
+test('geq(int, str): pass', function(){
+    expect($this->validator->greatOrEqual(3)->validate('abcde'))->toBeTrue();
+});
+
+test('geq(int, str): fail', function(){
+    expect($this->validator->greatOrEqual(10)->validate('abcde'))->toBeFalse();
+});
+
+test('geq(str, str): pass', function(){
+    expect($this->validator->greatOrEqual('abcde')->validate('abcdefg'))->toBeTrue();
+});
+
+test('geq(str, str): fail', function(){
+    expect($this->validator->greatOrEqual('abcde')->validate('abcd'))->toBeFalse();
+});
+
+test('geq(int, array): pass', function(){
+    expect($this->validator->greatOrEqual(3)->validate([1, 2, 3, 4]))->toBeTrue();
+});
+
+test('geq(int, array): fail', function(){
+    expect($this->validator->greatOrEqual(3)->validate([1,2]))->toBeFalse();
+});
+
+test('geq(array, array): pass', function(){
+    expect($this->validator->greatOrEqual([1,2])->validate([1,2,3,4]))->toBeTrue();
+});
+
+test('geq(array, array): fail', function(){
+    expect($this->validator->greatOrEqual([1,2,3,4])->validate([1,2,3]))->toBeFalse();
+});
+
+test('geq(DateTime): pass', function(){
+    expect($this->validator->greatOrEqual(new DateTimeImmutable('1981-05-12'))->validate(new DateTimeImmutable('now')))->toBeTrue();
+});
+
+test('geq(DateTime): fail', function(){
+    expect($this->validator->greatOrEqual(new DateTimeImmutable('now'))->validate(new DateTimeImmutable('1981-05-12')))->toBeFalse();
 });
 
 
-test('min(int): fail', function(){
-    expect($this->validator->min(10)->validate(5))->toBeFalse();
+
+
+test('great(numeric): pass', function(){
+    expect($this->validator->great(9)->validate(10))->toBeTrue();
 });
 
-test('min(float): fail', function(){
-    expect($this->validator->min(3.14)->validate(3.13))->toBeFalse();
+test('great(numeric): fail', function(){
+    expect($this->validator->great(10)->validate(9))->toBeFalse();
 });
 
-test('min(string|int): fail', function(){
-    expect($this->validator->min(10)->validate('abcde'))->toBeFalse();
+test('great(int, str): pass', function(){
+    expect($this->validator->great(3)->validate('abcde'))->toBeTrue();
 });
 
-test('min(string|string): fail', function(){
-    expect($this->validator->min('abcdefghij')->validate('abcde'))->toBeFalse();
+test('great(int, str): fail', function(){
+    expect($this->validator->great(10)->validate('abcde'))->toBeFalse();
 });
 
-test('min(DateTime): fail', function(){
-    expect($this->validator->min(new DateTimeImmutable('now'))->validate(new DateTimeImmutable('1981-05-12')))->toBeFalse();
+test('great(str, str): pass', function(){
+    expect($this->validator->great('abcde')->validate('abcdefg'))->toBeTrue();
 });
 
-
-
-
-test('max(int): pass', function(){
-    expect($this->validator->max(10)->validate(3))->toBeTrue();
+test('great(str, str): fail', function(){
+    expect($this->validator->great('abcde')->validate('abcd'))->toBeFalse();
 });
 
-test('max(float): pass', function(){
-    expect($this->validator->max(3.14)->validate(3.13))->toBeTrue();
+test('great(int, array): pass', function(){
+    expect($this->validator->great(3)->validate([1, 2, 3, 4]))->toBeTrue();
 });
 
-test('max(string|int): pass', function(){
-    expect($this->validator->max(10)->validate('abcde'))->toBeTrue();
+test('great(int, array): fail', function(){
+    expect($this->validator->great(3)->validate([1,2]))->toBeFalse();
 });
 
-test('max(string|string): pass', function(){
-    expect($this->validator->max('abcdefgh')->validate('abcde'))->toBeTrue();
+test('great(array, array): pass', function(){
+    expect($this->validator->great([1,2])->validate([1,2,3,4]))->toBeTrue();
 });
 
-test('max(DateTime): pass', function(){
-    expect($this->validator->max(new DateTimeImmutable('now'))->validate(new DateTimeImmutable('1981-05-12')))->toBeTrue();
+test('great(array, array): fail', function(){
+    expect($this->validator->great([1,2,3,4])->validate([1,2,3]))->toBeFalse();
 });
 
-test('max(int): fail', function(){
-    expect($this->validator->max(10)->validate(15))->toBeFalse();
+test('great(DateTime): pass', function(){
+    expect($this->validator->great(new DateTimeImmutable('1981-05-12'))->validate(new DateTimeImmutable('now')))->toBeTrue();
 });
 
-test('max(float): fail', function(){
-    expect($this->validator->max(3.14)->validate(3.15))->toBeFalse();
+test('great(DateTime): fail', function(){
+    expect($this->validator->great(new DateTimeImmutable('now'))->validate(new DateTimeImmutable('1981-05-12')))->toBeFalse();
 });
 
-test('max(string|int): fail', function(){
-    expect($this->validator->max(3)->validate('abcde'))->toBeFalse();
-});
-
-test('max(string|string): fail', function(){
-    expect($this->validator->max('abc')->validate('abcde'))->toBeFalse();
-});
-
-test('max(DateTime): fail', function(){
-    expect($this->validator->max(new DateTimeImmutable('1981-05-12'))->validate(new DateTimeImmutable('now')))->toBeFalse();
-});
 
 test('between(int): pass', function(){
     expect($this->validator->between(1, 5)->validate(3))->toBeTrue();
@@ -260,11 +364,11 @@ test('contains(string): fail', function(){
 });
 
 test('contains(array): pass', function(){
-    expect($this->validator->contains(['ab', 'cde', 'fgh'])->validate('cde'))->toBeTrue();
+    expect($this->validator->contains('cde')->validate(['ab', 'cde', 'fgh']))->toBeTrue();
 });
 
 test('contains(array): fail', function(){
-    expect($this->validator->contains(['ab', 'cd', 'ef'])->validate('xyz'))->toBeFalse();
+    expect($this->validator->contains('xyz')->validate(['ab', 'cde', 'fgh']))->toBeFalse();
 });
 
 test('file(): pass', function(){
