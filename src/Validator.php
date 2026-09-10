@@ -236,46 +236,126 @@ final class Validator
     {
         $this->data = $data;
 
-        if ($this->required) $this->checkRequired();
-        if (!is_null($this->empty) && is_string($this->data)) $this->checkEmptyStr();
-        if (!is_null($this->empty) && is_array($this->data)) $this->checkEmptyArray();
-        if (!is_null($this->nullable)) $this->checkNullable();
-        if (!is_null($this->type)) $this->checkType();
-        if (!is_null($this->is) && is_object($this->data)) $this->checkIs();
-        if (is_int($this->leq) && is_string($this->data)) $this->checkLeqIntStr();
-        if (is_string($this->leq) && is_string($this->data)) $this->checkLeqStrStr();
-        if (is_array($this->leq) && is_array($this->data)) $this->checkLeqArrayArray();
-        if (is_int($this->leq) && is_array($this->data)) $this->checkLeqIntArray();
-        if (is_numeric($this->leq) && is_numeric($this->data)) $this->checkLeqNumeric();
-        if (($this->leq instanceof DateTimeInterface) && ($this->data instanceof DateTimeInterface)) $this->checkLeqDateTime();
-        if (is_int($this->less) && is_string($this->data)) $this->checkLessIntStr();
-        if (is_string($this->less) && is_string($this->data)) $this->checkLessStrStr();
-        if (is_array($this->less) && is_array($this->data)) $this->checkLessArrayArray();
-        if (is_int($this->less) && is_array($this->data)) $this->checkLessIntArray();
-        if (is_numeric($this->less) && is_numeric($this->data)) $this->checkLessNumeric();
-        if (($this->less instanceof DateTimeInterface) && ($this->data instanceof DateTimeInterface)) $this->checkLessDateTime();
-        if (is_int($this->geq) && is_string($this->data)) $this->checkGeqIntStr();
-        if (is_string($this->geq) && is_string($this->data)) $this->checkGeqStrStr();
-        if (is_array($this->geq) && is_array($this->data)) $this->checkGeqArrayArray();
-        if (is_int($this->geq) && is_array($this->data)) $this->checkGeqIntArray();
-        if (is_numeric($this->geq) && is_numeric($this->data)) $this->checkGeqNumeric();
-        if (($this->geq instanceof DateTimeInterface) && ($this->data instanceof DateTimeInterface)) $this->checkGeqDateTime();
-        if (is_int($this->great) && is_string($this->data)) $this->checkGreatIntStr();
-        if (is_string($this->great) && is_string($this->data)) $this->checkGreatStrStr();
-        if (is_array($this->great) && is_array($this->data)) $this->checkGreatArrayArray();
-        if (is_int($this->great) && is_array($this->data)) $this->checkGreatIntArray();
-        if (is_numeric($this->great) && is_numeric($this->data)) $this->checkGreatNumeric();
-        if (($this->great instanceof DateTimeInterface) && ($this->data instanceof DateTimeInterface)) $this->checkGreatDateTime();
-        if (!is_null($this->betweenDown) && !is_null($this->betweenUp) && !is_string($this->data)) $this->checkBetween();
-        if (!is_null($this->betweenDown) && !is_null($this->betweenUp) && is_string($this->data)) $this->checkBetweenIntStr();
-        if (is_string($this->betweenDown) && is_string($this->betweenUp) && is_string($this->data)) $this->checkBetweenStrStr();
-        if (!is_null($this->contains) && is_array($this->data)) $this->checkContainsArray();
-        if (!is_null($this->contains) && is_string($this->data)) $this->checkContainsStr();
-        if ($this->file && is_string($this->data)) $this->checkFile();
-        if ($this->directory && is_string($this->data)) $this->checkDirectory();
-        if ($this->exists && is_string($this->data)) $this->checkExists();
-        if (is_string($this->startswith) && is_string($this->data)) $this->checkStartsWith();
-        if (is_string($this->endswith) && is_string($this->data)) $this->checkEndsWith();
+        if ($this->required) {
+            $this->checkRequired();
+        }
+        if (!is_null($this->empty) && is_string($this->data)) {
+            $this->checkEmptyStr();
+        }
+        if (!is_null($this->empty) && is_array($this->data)) {
+            $this->checkEmptyArray();
+        }
+        if (!is_null($this->nullable)) {
+            $this->checkNullable();
+        }
+        if (!is_null($this->type)) {
+            $this->checkType();
+        }
+        if (!is_null($this->is) && is_object($this->data)) {
+            $this->checkIs();
+        }
+        if (is_int($this->leq) && is_string($this->data)) {
+            $this->checkLeqIntStr();
+        }
+        if (is_string($this->leq) && is_string($this->data)) {
+            $this->checkLeqStrStr();
+        }
+        if (is_array($this->leq) && is_array($this->data)) {
+            $this->checkLeqArrayArray();
+        }
+        if (is_int($this->leq) && is_array($this->data)) {
+            $this->checkLeqIntArray();
+        }
+        if (is_numeric($this->leq) && is_numeric($this->data)) {
+            $this->checkLeqNumeric();
+        }
+        if (($this->leq instanceof DateTimeInterface) && ($this->data instanceof DateTimeInterface)) {
+            $this->checkLeqDateTime();
+        }
+        if (is_int($this->less) && is_string($this->data)) {
+            $this->checkLessIntStr();
+        }
+        if (is_string($this->less) && is_string($this->data)) {
+            $this->checkLessStrStr();
+        }
+        if (is_array($this->less) && is_array($this->data)) {
+            $this->checkLessArrayArray();
+        }
+        if (is_int($this->less) && is_array($this->data)) {
+            $this->checkLessIntArray();
+        }
+        if (is_numeric($this->less) && is_numeric($this->data)) {
+            $this->checkLessNumeric();
+        }
+        if (($this->less instanceof DateTimeInterface) && ($this->data instanceof DateTimeInterface)) {
+            $this->checkLessDateTime();
+        }
+        if (is_int($this->geq) && is_string($this->data)) {
+            $this->checkGeqIntStr();
+        }
+        if (is_string($this->geq) && is_string($this->data)) {
+            $this->checkGeqStrStr();
+        }
+        if (is_array($this->geq) && is_array($this->data)) {
+            $this->checkGeqArrayArray();
+        }
+        if (is_int($this->geq) && is_array($this->data)) {
+            $this->checkGeqIntArray();
+        }
+        if (is_numeric($this->geq) && is_numeric($this->data)) {
+            $this->checkGeqNumeric();
+        }
+        if (($this->geq instanceof DateTimeInterface) && ($this->data instanceof DateTimeInterface)) {
+            $this->checkGeqDateTime();
+        }
+        if (is_int($this->great) && is_string($this->data)) {
+            $this->checkGreatIntStr();
+        }
+        if (is_string($this->great) && is_string($this->data)) {
+            $this->checkGreatStrStr();
+        }
+        if (is_array($this->great) && is_array($this->data)) {
+            $this->checkGreatArrayArray();
+        }
+        if (is_int($this->great) && is_array($this->data)) {
+            $this->checkGreatIntArray();
+        }
+        if (is_numeric($this->great) && is_numeric($this->data)) {
+            $this->checkGreatNumeric();
+        }
+        if (($this->great instanceof DateTimeInterface) && ($this->data instanceof DateTimeInterface)) {
+            $this->checkGreatDateTime();
+        }
+        if (!is_null($this->betweenDown) && !is_null($this->betweenUp) && !is_string($this->data)) {
+            $this->checkBetween();
+        }
+        if (!is_null($this->betweenDown) && !is_null($this->betweenUp) && is_string($this->data)) {
+            $this->checkBetweenIntStr();
+        }
+        if (is_string($this->betweenDown) && is_string($this->betweenUp) && is_string($this->data)) {
+            $this->checkBetweenStrStr();
+        }
+        if (!is_null($this->contains) && is_array($this->data)) {
+            $this->checkContainsArray();
+        }
+        if (!is_null($this->contains) && is_string($this->data)) {
+            $this->checkContainsStr();
+        }
+        if ($this->file && is_string($this->data)) {
+            $this->checkFile();
+        }
+        if ($this->directory && is_string($this->data)) {
+            $this->checkDirectory();
+        }
+        if ($this->exists && is_string($this->data)) {
+            $this->checkExists();
+        }
+        if (is_string($this->startswith) && is_string($this->data)) {
+            $this->checkStartsWith();
+        }
+        if (is_string($this->endswith) && is_string($this->data)) {
+            $this->checkEndsWith();
+        }
 
         return empty($this->failed());
     }
@@ -535,7 +615,9 @@ final class Validator
      */
     private function checkIs(): void
     {
-        if(is_object($this->data)) $this->result['is'] = get_class($this->data) === $this->is;
+        if (is_object($this->data)) {
+            $this->result['is'] = get_class($this->data) === $this->is;
+        }
     }
 
     /**
@@ -564,7 +646,9 @@ final class Validator
      */
     private function checkLeqIntStr(): void
     {
-        if(is_string($this->data)) $this->result['leq'] = (mb_strlen($this->data) <= $this->leq);
+        if (is_string($this->data)) {
+            $this->result['leq'] = (mb_strlen($this->data) <= $this->leq);
+        }
     }
 
     /**
@@ -576,7 +660,9 @@ final class Validator
      */
     private function checkLeqStrStr(): void
     {
-        if(is_string($this->leq) && is_string($this->data)) $this->result['leq'] = (mb_strlen($this->data) <= mb_strlen($this->leq));
+        if (is_string($this->leq) && is_string($this->data)) {
+            $this->result['leq'] = (mb_strlen($this->data) <= mb_strlen($this->leq));
+        }
     }
 
     /**
@@ -588,7 +674,9 @@ final class Validator
      */
     private function checkLeqIntArray(): void
     {
-        if(is_array($this->data)) $this->result['leq'] = (sizeof($this->data) <= $this->leq);
+        if (is_array($this->data)) {
+            $this->result['leq'] = (sizeof($this->data) <= $this->leq);
+        }
     }
 
     /**
@@ -611,7 +699,9 @@ final class Validator
      */
     private function checkLeqArrayArray(): void
     {
-        if(is_array($this->leq) && is_array($this->data)) $this->result['leq'] = (sizeof($this->data) <= sizeof($this->leq));
+        if (is_array($this->leq) && is_array($this->data)) {
+            $this->result['leq'] = (sizeof($this->data) <= sizeof($this->leq));
+        }
     }
 
     /**
@@ -655,7 +745,9 @@ final class Validator
      */
     private function checkLessIntStr(): void
     {
-        if(is_string($this->data)) $this->result['less'] = (mb_strlen($this->data) < $this->less);
+        if (is_string($this->data)) {
+            $this->result['less'] = (mb_strlen($this->data) < $this->less);
+        }
     }
 
     /**
@@ -678,7 +770,9 @@ final class Validator
      */
     private function checkLessStrStr(): void
     {
-        if(is_string($this->less) && is_string($this->data)) $this->result['less'] = (mb_strlen($this->data) < mb_strlen($this->less));
+        if (is_string($this->less) && is_string($this->data)) {
+            $this->result['less'] = (mb_strlen($this->data) < mb_strlen($this->less));
+        }
     }
 
     /**
@@ -689,7 +783,9 @@ final class Validator
      */
     private function checkLessIntArray(): void
     {
-        if(is_array($this->data)) $this->result['less'] = (sizeof($this->data) < $this->less);
+        if (is_array($this->data)) {
+            $this->result['less'] = (sizeof($this->data) < $this->less);
+        }
     }
 
     /**
@@ -701,7 +797,9 @@ final class Validator
      */
     private function checkLessArrayArray(): void
     {
-        if(is_array($this->less) && is_array($this->data)) $this->result['less'] = (sizeof($this->data) < sizeof($this->less));
+        if (is_array($this->less) && is_array($this->data)) {
+            $this->result['less'] = (sizeof($this->data) < sizeof($this->less));
+        }
     }
 
     /**
@@ -742,7 +840,9 @@ final class Validator
      */
     private function checkGeqIntStr(): void
     {
-        if(is_string($this->data)) $this->result['geq'] = (mb_strlen($this->data) >= $this->geq);
+        if (is_string($this->data)) {
+            $this->result['geq'] = (mb_strlen($this->data) >= $this->geq);
+        }
     }
 
     /**
@@ -765,7 +865,9 @@ final class Validator
      */
     private function checkGeqStrStr(): void
     {
-        if(is_string($this->geq) && is_string($this->data)) $this->result['geq'] = (mb_strlen($this->data) >= mb_strlen($this->geq));
+        if (is_string($this->geq) && is_string($this->data)) {
+            $this->result['geq'] = (mb_strlen($this->data) >= mb_strlen($this->geq));
+        }
     }
 
     /**
@@ -777,7 +879,9 @@ final class Validator
      */
     private function checkGeqIntArray(): void
     {
-        if(is_array($this->data)) $this->result['geq'] = (sizeof($this->data) >= $this->geq);
+        if (is_array($this->data)) {
+            $this->result['geq'] = (sizeof($this->data) >= $this->geq);
+        }
     }
 
     /**
@@ -789,7 +893,9 @@ final class Validator
      */
     private function checkGeqArrayArray(): void
     {
-        if(is_array($this->geq) && is_array($this->data)) $this->result['geq'] = (sizeof($this->data) >= sizeof($this->geq));
+        if (is_array($this->geq) && is_array($this->data)) {
+            $this->result['geq'] = (sizeof($this->data) >= sizeof($this->geq));
+        }
     }
 
     /**
@@ -830,7 +936,9 @@ final class Validator
      */
     private function checkGreatIntStr(): void
     {
-        if(is_string($this->data)) $this->result['great'] = (mb_strlen($this->data) > $this->great);
+        if (is_string($this->data)) {
+            $this->result['great'] = (mb_strlen($this->data) > $this->great);
+        }
     }
 
     /**
@@ -853,7 +961,9 @@ final class Validator
      */
     private function checkGreatStrStr(): void
     {
-        if(is_string($this->great) && is_string($this->data)) $this->result['great'] = (mb_strlen($this->data) > mb_strlen($this->great));
+        if (is_string($this->great) && is_string($this->data)) {
+            $this->result['great'] = (mb_strlen($this->data) > mb_strlen($this->great));
+        }
     }
 
     /**
@@ -864,7 +974,9 @@ final class Validator
      */
     private function checkGreatIntArray(): void
     {
-        if(is_array($this->data)) $this->result['great'] = (sizeof($this->data) > $this->great);
+        if (is_array($this->data)) {
+            $this->result['great'] = (sizeof($this->data) > $this->great);
+        }
     }
 
     /**
@@ -876,7 +988,9 @@ final class Validator
      */
     private function checkGreatArrayArray(): void
     {
-        if(is_array($this->great) && is_array($this->data)) $this->result['great'] = (sizeof($this->data) > sizeof($this->great));
+        if (is_array($this->great) && is_array($this->data)) {
+            $this->result['great'] = (sizeof($this->data) > sizeof($this->great));
+        }
     }
 
     /**
@@ -937,7 +1051,9 @@ final class Validator
      */
     private function checkBetweenIntStr(): void
     {
-        if(is_string($this->data)) $this->result['between'] = ((mb_strlen($this->data) >= $this->betweenDown) && (mb_strlen($this->data) <= $this->betweenUp));
+        if (is_string($this->data)) {
+            $this->result['between'] = ((mb_strlen($this->data) >= $this->betweenDown) && (mb_strlen($this->data) <= $this->betweenUp));
+        }
     }
 
     /**
@@ -949,7 +1065,9 @@ final class Validator
      */
     private function checkBetweenStrStr(): void
     {
-        if(is_string($this->betweenDown) && is_string($this->betweenUp) && is_string($this->data)) $this->result['between'] = ((mb_strlen($this->data) >= mb_strlen($this->betweenDown)) && (mb_strlen($this->data) <= mb_strlen($this->betweenUp)));
+        if (is_string($this->betweenDown) && is_string($this->betweenUp) && is_string($this->data)) {
+            $this->result['between'] = ((mb_strlen($this->data) >= mb_strlen($this->betweenDown)) && (mb_strlen($this->data) <= mb_strlen($this->betweenUp)));
+        }
     }
 
     /**
@@ -982,7 +1100,9 @@ final class Validator
      */
     private function checkContainsArray(): void
     {
-        if(is_array($this->data)) $this->result['contains'] = in_array($this->contains, $this->data);
+        if (is_array($this->data)) {
+            $this->result['contains'] = in_array($this->contains, $this->data);
+        }
     }
 
     /**
@@ -995,7 +1115,9 @@ final class Validator
      */
     private function checkContainsStr(): void
     {
-        if(is_string($this->contains) && is_string($this->data)) $this->result['contains'] = str_contains($this->data, $this->contains);
+        if (is_string($this->contains) && is_string($this->data)) {
+            $this->result['contains'] = str_contains($this->data, $this->contains);
+        }
     }
 
     /**
@@ -1025,7 +1147,9 @@ final class Validator
      */
     private function checkFile(): void
     {
-        if(is_string($this->data)) $this->result['file'] = is_file($this->data);
+        if (is_string($this->data)) {
+            $this->result['file'] = is_file($this->data);
+        }
     }
 
     /**
@@ -1055,7 +1179,9 @@ final class Validator
      */
     private function checkDirectory(): void
     {
-        if(is_string($this->data)) $this->result['directory'] = is_dir($this->data);
+        if (is_string($this->data)) {
+            $this->result['directory'] = is_dir($this->data);
+        }
     }
 
     /**
@@ -1085,7 +1211,9 @@ final class Validator
      */
     private function checkExists(): void
     {
-        if(is_string($this->data)) $this->result['exists'] = file_exists($this->data);
+        if (is_string($this->data)) {
+            $this->result['exists'] = file_exists($this->data);
+        }
     }
 
     /**
@@ -1115,7 +1243,9 @@ final class Validator
      */
     private function checkStartsWith(): void
     {
-        if(is_string($this->startswith) && is_string($this->data)) $this->result['startswith'] = str_starts_with($this->data, $this->startswith);
+        if (is_string($this->startswith) && is_string($this->data)) {
+            $this->result['startswith'] = str_starts_with($this->data, $this->startswith);
+        }
     }
 
     /**
@@ -1145,6 +1275,8 @@ final class Validator
      */
     private function checkEndsWith(): void
     {
-        if(is_string($this->endswith) && is_string($this->data)) $this->result['endswith'] = str_ends_with($this->data, $this->endswith);
+        if (is_string($this->endswith) && is_string($this->data)) {
+            $this->result['endswith'] = str_ends_with($this->data, $this->endswith);
+        }
     }
 }
