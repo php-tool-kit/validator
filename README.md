@@ -1,233 +1,310 @@
-# Validator
+# PHP Tool Kit - Validator
 
-Utilitário para validar valores em variáveis PHP, através de uma interface fluente (fluent interface) de configuração de regras.
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![PHP Version](https://img.shields.io/badge/PHP-%3E%3D8.5.7-777BB4?logo=php)](https://www.php.net/)
 
-> Documentação gerada com auxílio de inteligência artificial
+Biblioteca PHP para validação de dados através de uma **interface fluente** (fluent interface). Permite encadear regras de validação de forma legível e consultar o resultado de cada regra individualmente.
+
+## Índice
+
+- [Requisitos](#requisitos)
+- [Instalação](#instalação)
+- [Uso Básico](#uso-básico)
+- [Regras de Validação](#regras-de-validação)
+  - [Obrigatoriedade e Nulidade](#obrigatoriedade-e-nulidade)
+  - [Tipos](#tipos)
+  - [Classes](#classes)
+  - [Limites e Intervalos](#limites-e-intervalos)
+  - [Conteúdo](#conteúdo)
+  - [Sistema de Arquivos](#sistema-de-arquivos)
+  - [Strings](#strings)
+- [Consultando Resultados](#consultando-resultados)
+- [Desenvolvimento](#desenvolvimento)
+- [Licença](#licença)
 
 ## Requisitos
 
 - PHP >= 8.5.7
-- mb_string
+- Extensão `mbstring`
 
 ## Instalação
+
+Via Composer:
 
 ```bash
 composer require php-tool-kit/validator
 ```
 
-## Visão geral
-
-O pacote é composto por dois elementos principais, no namespace `Ptk\Validator`:
-
-- **`Validator`**: classe principal, responsável por configurar e executar as regras de validação sobre um valor.
-- **`Types`**: enum com os tipos de dados suportados pela regra de verificação de tipo (`type()`).
-
-O fluxo básico de uso é:
-
-1. Instanciar `Validator`;
-2. Encadear os métodos das regras desejadas (`required()`, `empty()`, `nullable()`, `type()`, `is()`, `min()`, `max()`, `between()`, `contains()`, `file()`, `directory()`, `exists()`, `startswith()`, `endswith()`);
-3. Chamar `validate($valor)` para executar as regras configuradas;
-4. Consultar o resultado com `result()`, `passed()` ou `failed()`.
-
-## Exemplo básico
+## Uso Básico
 
 ```php
 <?php
-
 use Ptk\Validator\Validator;
 use Ptk\Validator\Types;
 
 $validator = (new Validator())
     ->required()
     ->type(Types::STRING)
-    ->min(3)
-    ->max(20);
+    ->greatOrEqual(3)
+    ->lessOrEqual(20);
 
-$ok = $validator->validate('everton');
-
-if ($ok) {
+if ($validator->validate('everton')) {
     echo "Valor válido!";
 } else {
     print_r($validator->failed());
 }
 ```
 
-## Regras disponíveis
+## Regras de Validação
 
-| Método | Descrição |
-| --- | --- |
-| `required(bool $required = true)` | Define se o valor é obrigatório (não pode ser nulo nem ter comprimento zero). |
-| `empty(bool $empty = true)` | Define se o valor pode ser vazio (mas não nulo, quando `true`); se `false`, o valor não pode ser nulo nem vazio. |
-| `nullable(bool $nullable = true)` | Define se o valor pode ser nulo. |
-| `type(Types $type)` | Define o tipo esperado do valor, de acordo com o enum `Types`. |
-| `is(string $className)` | Define que o valor deve ser uma instância da classe informada — comparação **exata** de classe (não usa `instanceof`); veja [Observações importantes](#observações-importantes). |
-| `min(int\|float\|string\|DateTimeInterface $min)` | Define o valor mínimo aceito (número, comprimento de string ou data/hora). |
-| `max(int\|float\|string\|DateTimeInterface $max)` | Define o valor máximo aceito (número, comprimento de string ou data/hora). |
-| `between($down, $up)` | Define um intervalo (inclusivo) aceito para o valor. `$down` e `$up` devem ser do mesmo tipo, caso contrário uma `RuntimeException` é lançada imediatamente. |
-| `contains(string\|array $contains)` | Define um valor (ou lista de valores) que o valor validado deve conter. |
-| `file(bool $file)` | Valida se o valor (um caminho) é um arquivo existente. |
-| `directory(bool $directory)` | Valida se o valor (um caminho) é um diretório existente. |
-| `exists(bool $exists)` | Valida se o valor (um caminho) existe no sistema de arquivos. |
-| `startswith(string $substr)` | Valida se o valor começa com a substring informada. |
-| `endswith(string $substr)` | Valida se o valor termina com a substring informada. |
+Todas as regras são encadeáveis e retornam a própria instância (`self`).
 
-### Exemplos por regra
+### Obrigatoriedade e Nulidade
 
-**required()** — o valor não pode ser nulo nem ter comprimento zero:
+#### `required(bool $required = true)`
+
+Define se o valor é obrigatório. Falha se o valor for nulo ou "vazio" (conforme `empty()` do PHP).
 
 ```php
-(new Validator())->required()->validate('abc');  // true
-(new Validator())->required()->validate(null);   // false
-(new Validator())->required()->validate('');     // false
+(new Validator())->required()->validate('oi');  // true
+(new Validator())->required()->validate('');    // false
+(new Validator())->required()->validate(null);  // false
 ```
 
-**empty()** — com `true`, o valor pode ser vazio, mas não nulo; com `false`, não pode ser nulo nem vazio:
+#### `empty(bool $empty = true)`
+
+Define se o valor **pode** ser vazio. Aplicável apenas a `string` e `array`.
 
 ```php
-(new Validator())->empty()->validate('');    // true
-(new Validator())->empty()->validate(null);  // false
-(new Validator())->empty(false)->validate([]);  // false
+(new Validator())->empty(false)->validate('');   // false
 (new Validator())->empty(false)->validate('ok'); // true
+(new Validator())->empty(true)->validate([]);    // true
 ```
 
-**nullable()** — controla se o valor pode ser nulo:
+#### `nullable(bool $nullable = true)`
+
+Define se o valor pode ser `null`.
 
 ```php
-(new Validator())->nullable()->validate(null);      // true
 (new Validator())->nullable(false)->validate(null); // false
+(new Validator())->nullable(true)->validate(null);  // true
 ```
 
-**type()** — verifica o tipo do valor com o enum `Types`:
+### Tipos
+
+#### `type(Types $type)`
+
+Valida o tipo do valor usando as funções nativas do PHP. Os tipos disponíveis estão no enum `Ptk\Validator\Types`:
+
+| Tipo | Função PHP | Descrição |
+|------|------------|-----------|
+| `Types::BOOL` | `is_bool()` | Booleano |
+| `Types::NUMERIC` | `is_numeric()` | Numérico (int, float ou string numérica) |
+| `Types::INT` | `is_int()` | Inteiro |
+| `Types::FLOAT` | `is_float()` | Ponto flutuante |
+| `Types::STRING` | `is_string()` | String |
+| `Types::ARRAY` | `is_array()` | Array |
+| `Types::OBJECT` | `is_object()` | Objeto |
+| `Types::RESOURCE` | `is_resource()` | Resource |
+| `Types::CALLABLE` | `is_callable()` | Chamável (função/método) |
 
 ```php
-(new Validator())->type(Types::INT)->validate(10);    // true
-(new Validator())->type(Types::INT)->validate('10');  // false
-(new Validator())->type(Types::NUMERIC)->validate('1.5'); // true
+use Ptk\Validator\Types;
+
+(new Validator())->type(Types::INT)->validate(10);       // true
+(new Validator())->type(Types::INT)->validate('10');      // false
+(new Validator())->type(Types::NUMERIC)->validate('3.14');// true
+(new Validator())->type(Types::STRING)->validate('oi');   // true
 ```
 
-**is()** — verifica a classe do objeto (comparação exata):
+### Classes
+
+#### `is(string $className)`
+
+Valida se o valor é uma instância **exata** da classe informada (usa `get_class()`, não `instanceof`). Aplicável apenas a objetos.
 
 ```php
-(new Validator())->is(DateTime::class)->validate(new DateTime()); // true
+(new Validator())->is(stdClass::class)->validate(new stdClass()); // true
+(new Validator())->is(stdClass::class)->validate(new Exception()); // false
 ```
 
-**min() / max() / between()** — números comparados por valor, strings comparadas por comprimento (`mb_strlen`) e datas comparadas entre si:
+### Limites e Intervalos
+
+As regras de comparação adaptam-se ao tipo do valor validado:
+
+- **Números** (`int`/`float`): comparados por valor
+- **Strings**: comparadas pelo comprimento (`mb_strlen`)
+- **Arrays**: comparados pelo número de elementos (`sizeof`)
+- **DateTimeInterface**: comparadas cronologicamente
+
+#### `lessOrEqual($value)` — menor ou igual (`<=`)
 
 ```php
-(new Validator())->min(10)->validate(15);            // true
-(new Validator())->min(10)->max(20)->validate(25);   // false
-(new Validator())->min(3)->validate('abcd');         // true (comprimento 4 >= 3)
-(new Validator())->max('eeee')->validate('ab');      // true (2 <= 4)
-(new Validator())->between(1, 10)->validate(5);      // true (inclusivo)
-(new Validator())->between(new DateTime('2020-01-01'), new DateTime('2030-12-31'))
-    ->validate(new DateTime());                      // true
+(new Validator())->lessOrEqual(10)->validate(5);     // true
+(new Validator())->lessOrEqual(5)->validate('oi');   // true (strlen = 2)
+(new Validator())->lessOrEqual(3)->validate([1, 2]); // true
 ```
 
-**contains()** — com string, verifica substring; com array, verifica se o valor está presente na lista:
+#### `less($value)` — estritamente menor (`<`)
 
 ```php
-(new Validator())->contains('@')->validate('user@example.com');   // true
-(new Validator())->contains(['a', 'b', 'c'])->validate('b');      // true
+(new Validator())->less(10)->validate(9); // true
 ```
 
-**file() / directory() / exists()** — verificam caminhos no sistema de arquivos:
+> **Obs.**: para `DateTimeInterface`, a comparação é inclusiva (`<=`).
+
+#### `greatOrEqual($value)` — maior ou igual (`>=`)
 
 ```php
-(new Validator())->file()->validate('/etc/hosts');       // true
-(new Validator())->directory()->validate('/var/log');    // true
-(new Validator())->exists()->validate('/etc/hosts');     // true
-(new Validator())->exists()->validate('/caminho/inexistente'); // false
+(new Validator())->greatOrEqual(3)->validate('everton'); // true (strlen = 7)
 ```
 
-**startswith() / endswith()** — verificam o início e o fim de strings:
+#### `great($value)` — estritamente maior (`>`)
 
 ```php
-(new Validator())->startswith('https://')->validate('https://proton.me'); // true
-(new Validator())->endswith('.pdf')->validate('relatorio.pdf');           // true
+(new Validator())->great(5)->validate(10); // true
 ```
 
-## Tipos suportados (enum `Types`)
+#### `between($down, $up)` — intervalo inclusivo
 
-| Caso | Verificação nativa correspondente |
-| --- | --- |
-| `Types::BOOL` | `is_bool()` |
-| `Types::NUMERIC` | `is_numeric()` |
-| `Types::INT` | `is_int()` |
-| `Types::FLOAT` | `is_float()` |
-| `Types::STRING` | `is_string()` |
-| `Types::ARRAY` | `is_array()` |
-| `Types::OBJECT` | `is_object()` |
-| `Types::RESOURCE` | `is_resource()` |
-| `Types::CALLABLE` | `is_callable()` |
-
-## Consultando o resultado
-
-Após chamar `validate()`, é possível consultar o resultado de três formas:
-
-- **`result(): array`** — retorna o resultado de todas as regras configuradas ou não. Cada chave é o nome da regra (ex.: `required`, `type`, `min`, etc.) e o valor pode ser `true` (passou), `false` (falhou) ou `null` (regra não configurada, portanto não testada).
-- **`passed(): array`** — retorna apenas as regras cujo resultado foi `true`.
-- **`failed(): array`** — retorna apenas as regras cujo resultado foi `false` (regras não configuradas, com valor `null`, não são consideradas falhas).
+Os limites devem ser do **mesmo tipo**, caso contrário uma `RuntimeException` é lançada.
 
 ```php
-$validator->validate($valor);
-
-$validator->result();  // resultado completo
-$validator->passed();  // apenas o que passou
-$validator->failed();  // apenas o que falhou
+(new Validator())->between(1, 10)->validate(5);          // true
+(new Validator())->between(3, 20)->validate('everton');  // true (strlen = 7)
+(new Validator())->between('a', 'zzz')->validate('oi');  // true (compara comprimentos)
 ```
 
-Exemplo:
+### Conteúdo
+
+#### `contains(string|array $contains)`
+
+- Se o valor for `string`: verifica substring (`str_contains`).
+- Se o valor for `array`: verifica presença com `in_array` (comparação não estrita).
 
 ```php
-$validator = (new Validator())->required()->min(3);
-$validator->validate('ab');
+(new Validator())->contains('ton')->validate('everton'); // true
+(new Validator())->contains('foo')->validate(['foo', 'bar']); // true
+```
 
+### Sistema de Arquivos
+
+As regras abaixo só executam quando o valor validado é uma `string` (caminho).
+
+#### `file(bool $file = true)`
+
+Valida se o caminho é um arquivo existente (`is_file`).
+
+```php
+(new Validator())->file()->validate('/etc/hosts'); // true (se existir)
+```
+
+#### `directory(bool $directory = true)`
+
+Valida se o caminho é um diretório existente (`is_dir`).
+
+```php
+(new Validator())->directory()->validate('/tmp'); // true
+```
+
+#### `exists(bool $exists = true)`
+
+Valida se o caminho existe no sistema de arquivos (`file_exists`).
+
+```php
+(new Validator())->exists()->validate('/algum/caminho');
+```
+
+### Strings
+
+#### `startswith(string $substr)`
+
+Valida se a string começa com a substring informada (`str_starts_with`).
+
+```php
+(new Validator())->startswith('php')->validate('php-tool-kit'); // true
+```
+
+#### `endswith(string $substr)`
+
+Valida se a string termina com a substring informada (`str_ends_with`).
+
+```php
+(new Validator())->endswith('.md')->validate('README.md'); // true
+```
+
+## Consultando Resultados
+
+Após chamar `validate($valor)`, você pode consultar os resultados:
+
+### `result(): array`
+
+Retorna o estado de **todas** as regras, configuradas ou não:
+
+- `true` — regra passou
+- `false` — regra falhou
+- `null` — regra não foi configurada
+
+```php
+$validator = (new Validator())->required()->type(Types::INT);
+$validator->validate('abc');
 print_r($validator->result());
-// ['required' => true, 'empty' => null, 'nullable' => null, ..., 'min' => false, ...]
-
-print_r($validator->passed()); // ['required']
-print_r($validator->failed()); // ['min']
+// ['required' => true, 'type' => false]
 ```
 
-## Observações importantes
+### `passed(): array`
 
-- **Restrição de `is()`**: a validação compara o nome da classe do valor **exatamente** com o nome informado (via `get_class()`), e não usa `instanceof`. Isso significa que instâncias de **subclasses** da classe informada **falham** na validação — só passam objetos cuja classe seja idêntica a `$className`.
+Lista apenas os nomes das regras que **passaram**.
 
-  ```php
-  class Animal {}
-  class Cachorro extends Animal {}
+```php
+$validator->passed(); // ['required']
+```
 
-  (new Validator())->is(Animal::class)->validate(new Cachorro());
-  // false, pois Cachorro !== Animal, mesmo sendo subclasse
-  ```
+### `failed(): array`
 
-- **`between()` lança exceção em tempo de configuração**: `$down` e `$up` precisam ser exatamente do mesmo tipo (`gettype($down) === gettype($up)`). Se forem de tipos diferentes, uma `\RuntimeException` é lançada **imediatamente ao chamar `between()`**, antes mesmo de `validate()` ser executado — portanto esse erro não aparece em `result()`/`failed()`, e sim como uma exceção não capturada caso não seja tratada.
+Lista apenas os nomes das regras que **falharam**.
 
-  ```php
-  (new Validator())->between(1, '10'); // lança RuntimeException, tipos diferentes (int vs string)
-  (new Validator())->between(1, 10);   // OK, ambos int
-  ```
+```php
+$validator->failed(); // ['type']
+```
 
-- Os métodos `file()`, `directory()` e `exists()` só executam a verificação quando o parâmetro é `true`; passar `false` não gera nenhum teste (o resultado permanece `null` em `result()`), e não representa uma validação negativa.
+### Retorno de `validate()`
 
-- **Comparações de `min()`, `max()` e `between()` são sensíveis ao tipo do dado**: dado numérico é comparado por valor, string é comparada pelo comprimento (`mb_strlen`) e valores de data/hora são comparados entre si. Um dado `null` falha nas regras de tipo e nas verificações de comprimento.
+O método `validate()` retorna `true` se **nenhuma** regra configurada falhou, e `false` caso contrário.
 
-- **`contains()` com array não usa comparação estrita**: a verificação usa `in_array()` sem comparação estrita, portanto `'1'` e `1` são considerados equivalentes.
+## Desenvolvimento
 
-## Testes e qualidade de código
-
-O `composer.json` do projeto já define alguns scripts úteis:
+### Instalando dependências
 
 ```bash
-composer test    # executa os testes com Pest e checagem de cobertura de tipos
-composer static  # executa a análise estática com PHPStan
-composer code    # corrige e verifica o código conforme os padrões PSR-1, PSR-2 e PSR-12
+composer install
 ```
 
-## Autor
+### Scripts disponíveis
 
-- **Everton da Rosa** — everton3x@gmail.com — [everton3x.github.io](https://everton3x.github.io)
+| Comando | Descrição |
+|---------|-----------|
+| `composer test` | Executa testes com Pest + cobertura + type-coverage |
+| `composer static` | Análise estática com PHPStan |
+| `composer code` | Corrige e verifica PSR-1/PSR-2/PSR-12 |
+| `composer fix-code` | Aplica correções automáticas (PHP_CodeSniffer) |
+| `composer psr-code` | Verifica conformidade com PSR |
 
 ## Licença
 
-MIT
+Este projeto está licenciado sob a [MIT License](LICENSE).
+
+## Autor
+
+**Everton da Rosa** — <everton3x@gmail.com>  
+<https://everton3x.github.io>
+
+## Links
+
+- [Homepage](https://php-tool-kit.github.io/validator)
+- [Repositório](https://github.com/php-tool-kit/validator)
+- [Issues](https://github.com/php-tool-kit/validator/issues)
+
+---
+
+Documentação criada com auxílio de I.A.
