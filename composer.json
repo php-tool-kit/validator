@@ -27,7 +27,7 @@
         "email": "everton3x@gmail.com",
         "issues": "https://github.com/php-tool-kit/validator/issues",
         "source": "https://github.com/php-tool-kit/validator/source",
-        "docs": "https://github.com/php-tool-kit/validator/README.md"
+        "docs": "https://php-tool-kit.github.io/validator/html/"
     },
     "require": {
         "php": ">=8.5.7",
